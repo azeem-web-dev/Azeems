@@ -138,6 +138,30 @@ a:hover { text-decoration: underline; }
   margin: 3px 0 6px;
 }
 
+/* ---------- Experience ---------- */
+.exp { margin-bottom: 14px; }
+.exp:last-child { margin-bottom: 0; }
+.exp-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.exp-role { font-size: 15px; font-weight: 700; color: var(--ink); }
+.exp-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+.exp-company {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  margin: 1px 0 6px;
+}
+
 /* ---------- Bullets ---------- */
 .bullets { list-style: none; }
 .bullets li {
@@ -267,10 +291,12 @@ a:hover { text-decoration: underline; }
   .section { margin-bottom: 14px; }
   .section-title { font-size: 11px; margin-bottom: 8px; }
   .summary, .bullets li, .lang-list li { font-size: 10px; }
-  .project-name { font-size: 12.5px; }
-  .project-stack { font-size: 9.5px; }
+  .project-name, .exp-role { font-size: 12px; }
+  .project-stack, .exp-company { font-size: 9.5px; }
+  .exp-date { font-size: 9.5px; }
   .tag { font-size: 9.5px; padding: 2px 7px; }
+  .section { margin-bottom: 12px; }
 
   .grid { page-break-inside: avoid; }
-  .project, .edu, .skill-group { page-break-inside: avoid; }
+  .project, .exp, .edu, .skill-group { page-break-inside: avoid; }
 }
