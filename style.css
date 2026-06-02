@@ -1,0 +1,276 @@
+/* ===========================================================
+   Rayyan Azeem Syed — Resume stylesheet
+   Screen-friendly + print/PDF-optimized (A4, single page target)
+   =========================================================== */
+
+:root {
+  --accent: #1f8a8a;          /* teal, echoing the certificate */
+  --accent-dark: #156060;
+  --ink: #1a2430;
+  --muted: #5b6775;
+  --line: #e3e8ee;
+  --bg: #eef1f5;
+  --card: #ffffff;
+  --tag-bg: #e8f4f4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.5;
+  padding: 32px 16px;
+  font-size: 14px;
+}
+
+a { color: var(--accent-dark); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Page container ---------- */
+.resume {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(20, 40, 60, 0.12);
+  overflow: hidden;
+}
+
+/* ---------- Header ---------- */
+.header {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  padding: 32px 40px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.name {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+.title {
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.95;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.contact {
+  list-style: none;
+  font-size: 12.5px;
+  display: grid;
+  gap: 5px;
+}
+.contact a { color: #fff; }
+.contact .ico {
+  display: inline-block;
+  width: 18px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0.9;
+}
+
+/* ---------- Layout grid ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+}
+.col-left  { padding: 28px 28px 28px 40px; }
+.col-right {
+  padding: 28px 40px 28px 28px;
+  background: #fafbfc;
+  border-left: 1px solid var(--line);
+}
+
+/* ---------- Sections ---------- */
+.section { margin-bottom: 22px; }
+.section:last-child { margin-bottom: 0; }
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-dark);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid var(--accent);
+  display: inline-block;
+}
+
+.summary { font-size: 13.5px; color: #2c3744; }
+
+/* ---------- Projects ---------- */
+.project { margin-bottom: 16px; }
+.project:last-child { margin-bottom: 0; }
+.project-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.project-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  background: var(--tag-bg);
+  border: 1px solid #cfe6e6;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.project-stack {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 3px 0 6px;
+}
+
+/* ---------- Bullets ---------- */
+.bullets { list-style: none; }
+.bullets li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #2c3744;
+}
+.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ---------- Skills ---------- */
+.skill-group { margin-bottom: 12px; }
+.skill-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font-size: 11.5px;
+  font-weight: 500;
+  background: var(--tag-bg);
+  color: var(--accent-dark);
+  border: 1px solid #d6e9e9;
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+/* ---------- Education ---------- */
+.edu { margin-bottom: 12px; }
+.edu:last-child { margin-bottom: 0; }
+.edu-degree { font-size: 13.5px; font-weight: 700; }
+.edu-school { font-size: 12.5px; color: #34404d; }
+.edu-meta { font-size: 12px; color: var(--muted); }
+
+/* ---------- Languages ---------- */
+.lang-list { list-style: none; }
+.lang-list li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--line);
+}
+.lang-list li:last-child { border-bottom: none; }
+
+.muted { color: var(--muted); font-weight: 400; font-size: 12px; }
+
+/* ---------- Download button ---------- */
+.download-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 50;
+  background: var(--accent-dark);
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(21, 96, 96, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.download-btn:hover { background: var(--accent); transform: translateY(-1px); }
+
+/* ---------- Responsive (mobile) ---------- */
+@media (max-width: 700px) {
+  .grid { grid-template-columns: 1fr; }
+  .col-left, .col-right {
+    padding: 24px;
+  }
+  .col-right { border-left: none; border-top: 1px solid var(--line); }
+  .header { padding: 24px; }
+  .name { font-size: 26px; }
+}
+
+/* ===========================================================
+   PRINT / PDF  (A4, single page, ink-friendly)
+   =========================================================== */
+@media print {
+  @page { size: A4; margin: 0; }
+
+  body {
+    background: #fff;
+    padding: 0;
+    font-size: 10.5px;
+  }
+  .no-print { display: none !important; }
+
+  .resume {
+    max-width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  /* Force background colors to print */
+  .header,
+  .badge,
+  .tag,
+  .col-right {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .header { padding: 22px 32px; }
+  .name { font-size: 26px; }
+  .title { font-size: 12px; }
+  .contact { font-size: 10px; gap: 3px; }
+
+  .col-left  { padding: 20px 20px 20px 32px; }
+  .col-right { padding: 20px 32px 20px 20px; }
+
+  .section { margin-bottom: 14px; }
+  .section-title { font-size: 11px; margin-bottom: 8px; }
+  .summary, .bullets li, .lang-list li { font-size: 10px; }
+  .project-name { font-size: 12.5px; }
+  .project-stack { font-size: 9.5px; }
+  .tag { font-size: 9.5px; padding: 2px 7px; }
+
+  .grid { page-break-inside: avoid; }
+  .project, .edu, .skill-group { page-break-inside: avoid; }
+}
