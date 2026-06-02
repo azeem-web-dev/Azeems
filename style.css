@@ -303,13 +303,13 @@ a:hover { text-decoration: underline; }
     print-color-adjust: exact;
   }
 
-  .header { padding: 22px 32px; }
-  .name { font-size: 26px; }
+  .header { padding: 18px 32px; }
+  .name { font-size: 25px; }
   .title { font-size: 12px; }
   .contact { font-size: 10px; gap: 3px; }
 
-  .col-left  { padding: 20px 20px 20px 32px; }
-  .col-right { padding: 20px 32px 20px 20px; }
+  .col-left  { padding: 16px 18px 16px 32px; }
+  .col-right { padding: 16px 32px 16px 18px; }
 
   .section { margin-bottom: 14px; }
   .section-title { font-size: 11px; margin-bottom: 8px; }
@@ -318,7 +318,8 @@ a:hover { text-decoration: underline; }
   .project-stack, .exp-company { font-size: 9.5px; }
   .exp-date { font-size: 9.5px; }
   .tag { font-size: 9.5px; padding: 2px 7px; }
-  .section { margin-bottom: 12px; }
+  .section { margin-bottom: 10px; }
+  .skill-group { margin-bottom: 8px; }
 
   .grid { page-break-inside: avoid; }
   .project, .exp, .edu, .skill-group { page-break-inside: avoid; }
