@@ -318,10 +318,10 @@ a:hover { text-decoration: underline; }
   .project-stack, .exp-company { font-size: 9.5px; }
   .exp-date { font-size: 9.5px; }
   .tag { font-size: 9.5px; padding: 2px 7px; }
-  .section { margin-bottom: 10px; }
-  .skill-group { margin-bottom: 8px; }
-  .exp { margin-bottom: 9px; }
-  .project { margin-bottom: 9px; }
+  .section { margin-bottom: 8px; }
+  .skill-group { margin-bottom: 6px; }
+  .exp { margin-bottom: 8px; }
+  .project { margin-bottom: 8px; }
 
   .grid { page-break-inside: avoid; }
   .project, .exp, .edu, .skill-group { page-break-inside: avoid; }
