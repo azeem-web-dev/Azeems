@@ -7,7 +7,7 @@
   <meta name="description" content="Portfolio of Rayyan Azeem Syed — Co-Founder & CEO of HMGenX, Full-Stack & AI Developer. Builder of revenue-generating computer-vision products." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="portfolio.css" />
 </head>
 <body>
@@ -27,8 +27,8 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero" id="home">
-    <div id="vanta-hero" class="vanta-bg"></div>
-    <div class="hero-grain"></div>
+    <canvas id="deskscene"></canvas>
+    <div class="hero-overlay"></div>
     <div class="hero-inner">
       <div class="hero-left">
         <p class="hero-eyebrow reveal"><span class="dot"></span> Co-Founder &amp; CEO · HMGenX</p>
@@ -36,16 +36,9 @@
         <p class="hero-tag reveal">Full-Stack &amp; AI Developer — I turn ideas into
           computer-vision products that <em>real businesses pay for.</em></p>
         <div class="hero-cta reveal">
-          <a class="btn btn-gold" href="#projects">View My Work</a>
+          <a class="btn btn-solid" href="#projects">View My Work</a>
           <a class="btn btn-ghost" href="resume.html">Read Résumé</a>
         </div>
-      </div>
-      <div class="hero-terminal glass reveal">
-        <div class="term-bar">
-          <span class="tb-dot"></span><span class="tb-dot"></span><span class="tb-dot"></span>
-          <i class="tb-name">developer.js</i>
-        </div>
-        <pre class="term-body"><code id="typed"></code><span class="caret">▍</span></pre>
       </div>
     </div>
     <a class="hero-scroll" href="#about" aria-label="Scroll down"><span></span></a>
@@ -223,7 +216,6 @@
 
     <!-- ============ CONTACT ============ -->
     <section class="section section-dark" id="contact">
-      <div id="vanta-contact" class="vanta-bg"></div>
       <div class="container contact-inner">
         <p class="kicker reveal">06 — Contact</p>
         <h2 class="title reveal">Let's build something <em>worth paying for</em></h2>
@@ -246,7 +238,6 @@
   </main>
 
   <script src="three.min.js"></script>
-  <script src="vanta.net.min.js"></script>
   <script src="portfolio.js"></script>
 </body>
 </html>
