@@ -7,7 +7,7 @@
   <meta name="description" content="Portfolio of Rayyan Azeem Syed — Co-Founder & CEO of HMGenX, Full-Stack & AI Developer. Builder of revenue-generating computer-vision products." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="portfolio.css" />
 </head>
 <body>
@@ -27,16 +27,25 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero" id="home">
-    <canvas id="scene"></canvas>
+    <div id="vanta-hero" class="vanta-bg"></div>
+    <div class="hero-grain"></div>
     <div class="hero-inner">
-      <p class="hero-eyebrow reveal">Co-Founder &amp; CEO · HMGenX</p>
-      <h1 class="hero-name reveal">Rayyan <em>Azeem</em> Syed</h1>
-      <div class="hero-rule reveal"><span></span>✦<span></span></div>
-      <p class="hero-tag reveal">Full-Stack &amp; AI Developer — crafting computer-vision products
-        that real businesses pay for.</p>
-      <div class="hero-cta reveal">
-        <a class="btn btn-gold" href="#projects">View My Work</a>
-        <a class="btn btn-ghost" href="resume.html">Read Résumé</a>
+      <div class="hero-left">
+        <p class="hero-eyebrow reveal"><span class="dot"></span> Co-Founder &amp; CEO · HMGenX</p>
+        <h1 class="hero-name reveal">Rayyan <em>Azeem</em> Syed</h1>
+        <p class="hero-tag reveal">Full-Stack &amp; AI Developer — I turn ideas into
+          computer-vision products that <em>real businesses pay for.</em></p>
+        <div class="hero-cta reveal">
+          <a class="btn btn-gold" href="#projects">View My Work</a>
+          <a class="btn btn-ghost" href="resume.html">Read Résumé</a>
+        </div>
+      </div>
+      <div class="hero-terminal glass reveal">
+        <div class="term-bar">
+          <span class="tb-dot"></span><span class="tb-dot"></span><span class="tb-dot"></span>
+          <i class="tb-name">developer.js</i>
+        </div>
+        <pre class="term-body"><code id="typed"></code><span class="caret">▍</span></pre>
       </div>
     </div>
     <a class="hero-scroll" href="#about" aria-label="Scroll down"><span></span></a>
@@ -61,10 +70,10 @@
             deployed product that someone is happy to pay for.</p>
           </div>
           <div class="about-stats">
-            <div class="stat reveal"><span class="stat-num" data-count="60">0</span><span class="stat-unit">k+</span><p>₹ client revenue</p></div>
-            <div class="stat reveal"><span class="stat-num" data-count="3">0</span><span class="stat-unit"></span><p>deployed products</p></div>
-            <div class="stat reveal"><span class="stat-num" data-count="2">0</span><span class="stat-unit"></span><p>internships</p></div>
-            <div class="stat reveal"><span class="stat-num" data-count="99">0</span><span class="stat-unit">%</span><p>best model accuracy</p></div>
+            <div class="stat glass reveal"><span class="stat-num" data-count="60">0</span><span class="stat-unit">k+</span><p>₹ client revenue</p></div>
+            <div class="stat glass reveal"><span class="stat-num" data-count="3">0</span><span class="stat-unit"></span><p>deployed products</p></div>
+            <div class="stat glass reveal"><span class="stat-num" data-count="2">0</span><span class="stat-unit"></span><p>internships</p></div>
+            <div class="stat glass reveal"><span class="stat-num" data-count="99">0</span><span class="stat-unit">%</span><p>best model accuracy</p></div>
           </div>
         </div>
       </div>
@@ -113,7 +122,7 @@
         <h2 class="title reveal">Products with <em>proof</em></h2>
 
         <div class="projects">
-          <article class="card reveal" data-tilt>
+          <article class="card glass grad-border reveal" data-tilt>
             <div class="card-top">
               <span class="card-no">I</span>
               <span class="card-badge">Deployed · ₹40,000</span>
@@ -126,7 +135,7 @@
             <p class="card-stack">Python · OpenCV · MySQL · Desktop &amp; Mobile</p>
           </article>
 
-          <article class="card reveal" data-tilt>
+          <article class="card glass grad-border reveal" data-tilt>
             <div class="card-top">
               <span class="card-no">II</span>
               <span class="card-badge">Client · ₹20,000</span>
@@ -139,7 +148,7 @@
             <p class="card-stack">Python · YOLO · CUDA · OpenCV · PyQt6</p>
           </article>
 
-          <article class="card reveal" data-tilt>
+          <article class="card glass grad-border reveal" data-tilt>
             <div class="card-top">
               <span class="card-no">III</span>
               <span class="card-badge">SIH 2025</span>
@@ -161,19 +170,19 @@
         <p class="kicker reveal">04 — Capabilities</p>
         <h2 class="title reveal">Technical <em>skills</em></h2>
         <div class="skills">
-          <div class="skill-col reveal">
+          <div class="skill-col glass grad-border reveal">
             <h4>Programming</h4>
             <ul><li>Python</li><li>C</li><li>JavaScript</li><li>Dart</li></ul>
           </div>
-          <div class="skill-col reveal">
+          <div class="skill-col glass grad-border reveal">
             <h4>Web &amp; Mobile</h4>
             <ul><li>HTML5 / CSS3</li><li>React.js</li><li>Node.js</li><li>Flutter</li><li>Web Design · UI/UX</li><li>PyQt6</li></ul>
           </div>
-          <div class="skill-col reveal">
+          <div class="skill-col glass grad-border reveal">
             <h4>AI &amp; Machine Learning</h4>
             <ul><li>OpenCV</li><li>YOLO</li><li>PyTorch</li><li>TensorFlow</li><li>Pandas</li><li>CUDA / GPU</li><li>ML Kit</li></ul>
           </div>
-          <div class="skill-col reveal">
+          <div class="skill-col glass grad-border reveal">
             <h4>Data &amp; Tools</h4>
             <ul><li>MySQL</li><li>Supabase</li><li>Firebase</li><li>REST APIs</li><li>Git / GitHub</li><li>Docker · Linux</li><li>Postman</li></ul>
           </div>
@@ -187,17 +196,17 @@
         <p class="kicker reveal">05 — Education &amp; Honours</p>
         <h2 class="title reveal">The <em>foundation</em></h2>
         <div class="edu-grid">
-          <div class="edu-card reveal">
+          <div class="edu-card glass grad-border reveal">
             <h4>B.Tech — Computer Science</h4>
             <p>RISE Krishna Sai Prakasam, Valluru</p>
             <p class="edu-meta">Expected 2027 · SGPA 8.44</p>
           </div>
-          <div class="edu-card reveal">
+          <div class="edu-card glass grad-border reveal">
             <h4>Intermediate — MPC</h4>
             <p>Narayana Junior College, Kandukur</p>
             <p class="edu-meta">2023 · 95.3%</p>
           </div>
-          <div class="edu-card reveal">
+          <div class="edu-card glass grad-border reveal">
             <h4>SSC</h4>
             <p>Narayana EM School, Kandukur</p>
             <p class="edu-meta">2021 · 100%</p>
@@ -214,7 +223,7 @@
 
     <!-- ============ CONTACT ============ -->
     <section class="section section-dark" id="contact">
-      <canvas id="scene2"></canvas>
+      <div id="vanta-contact" class="vanta-bg"></div>
       <div class="container contact-inner">
         <p class="kicker reveal">06 — Contact</p>
         <h2 class="title reveal">Let's build something <em>worth paying for</em></h2>
@@ -237,6 +246,7 @@
   </main>
 
   <script src="three.min.js"></script>
+  <script src="vanta.net.min.js"></script>
   <script src="portfolio.js"></script>
 </body>
 </html>

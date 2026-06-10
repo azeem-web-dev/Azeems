@@ -1,40 +1,33 @@
 /* ===========================================================
-   Portfolio interactions — 3D scenes, reveals, counters, tilt
+   Portfolio interactions
+   typed terminal · VANTA 3D net · reveals · counters · tilt
    =========================================================== */
 
 /* ---------- Nav state ---------- */
 const nav = document.getElementById("nav");
-window.addEventListener("scroll", () => {
-  nav.classList.toggle("scrolled", window.scrollY > 60);
-});
+window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.scrollY > 60));
 
 /* ---------- Scroll reveals ---------- */
 const io = new IntersectionObserver(
   (entries) => {
-    entries.forEach((e, i) => {
+    entries.forEach((e) => {
       if (e.isIntersecting) {
-        e.target.style.transitionDelay = `${(e.target.dataset.idx % 6) * 90}ms`;
+        e.target.style.transitionDelay = `${(e.target.dataset.idx % 5) * 80}ms`;
         e.target.classList.add("in");
         io.unobserve(e.target);
       }
     });
   },
-  { threshold: 0.15 }
+  { threshold: 0.14 }
 );
-document.querySelectorAll(".reveal").forEach((el, i) => {
-  el.dataset.idx = i;
-  io.observe(el);
-});
+document.querySelectorAll(".reveal").forEach((el, i) => { el.dataset.idx = i; io.observe(el); });
 
 /* ---------- Stat counters ---------- */
 const counterIO = new IntersectionObserver(
   (entries) => {
     entries.forEach((e) => {
       if (!e.isIntersecting) return;
-      const el = e.target;
-      const target = +el.dataset.count;
-      const dur = 1600;
-      const t0 = performance.now();
+      const el = e.target, target = +el.dataset.count, dur = 1600, t0 = performance.now();
       const tick = (t) => {
         const p = Math.min((t - t0) / dur, 1);
         el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
@@ -54,98 +47,80 @@ document.querySelectorAll("[data-tilt]").forEach((card) => {
     const r = card.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width - 0.5;
     const y = (e.clientY - r.top) / r.height - 0.5;
-    card.style.transform = `perspective(900px) rotateY(${x * 7}deg) rotateX(${-y * 7}deg) translateY(-4px)`;
+    card.style.transform = `perspective(900px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-6px)`;
   });
-  card.addEventListener("mouseleave", () => {
-    card.style.transform = "";
-  });
+  card.addEventListener("mouseleave", () => { card.style.transform = ""; });
 });
 
 /* ===========================================================
-   Three.js scenes (guarded — page works fine without WebGL)
+   Typed code terminal
    =========================================================== */
-function makeScene(canvasId, opts = {}) {
-  if (typeof THREE === "undefined") return;
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-  camera.position.z = 7;
-
-  const gold = new THREE.Color(0xb8924d);
-  const goldSoft = new THREE.Color(0xd6bb86);
-
-  /* Particle field */
-  const N = opts.particles ?? 700;
-  const pos = new Float32Array(N * 3);
-  for (let i = 0; i < N * 3; i++) pos[i] = (Math.random() - 0.5) * 18;
-  const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const pMat = new THREE.PointsMaterial({
-    color: goldSoft,
-    size: 0.022,
-    transparent: true,
-    opacity: 0.75,
-  });
-  const points = new THREE.Points(pGeo, pMat);
-  scene.add(points);
-
-  /* Elegant wireframe solids */
-  const group = new THREE.Group();
-  const mat = new THREE.MeshBasicMaterial({
-    color: gold,
-    wireframe: true,
-    transparent: true,
-    opacity: 0.28,
-  });
-  const ico = new THREE.Mesh(new THREE.IcosahedronGeometry(2.1, 0), mat);
-  group.add(ico);
-  const torus = new THREE.Mesh(
-    new THREE.TorusGeometry(3.1, 0.012, 12, 110),
-    new THREE.MeshBasicMaterial({ color: goldSoft, transparent: true, opacity: 0.35 })
-  );
-  torus.rotation.x = Math.PI / 2.6;
-  group.add(torus);
-  const torus2 = torus.clone();
-  torus2.rotation.x = -Math.PI / 2.9;
-  torus2.scale.setScalar(1.18);
-  group.add(torus2);
-  scene.add(group);
-
-  /* Mouse parallax */
-  let mx = 0, my = 0;
-  window.addEventListener("mousemove", (e) => {
-    mx = (e.clientX / window.innerWidth - 0.5) * 2;
-    my = (e.clientY / window.innerHeight - 0.5) * 2;
-  });
-
-  function resize() {
-    const w = canvas.clientWidth || canvas.parentElement.clientWidth;
-    const h = canvas.clientHeight || canvas.parentElement.clientHeight;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+(function typeTerminal() {
+  const code = document.getElementById("typed");
+  if (!code) return;
+  const T = [
+    ["const ", "k"], ["developer", ""], [" = {\n", ""],
+    ["  name", "p"], [": ", ""], ['"Rayyan Azeem Syed"', "s"], [",\n", ""],
+    ["  role", "p"], [": ", ""], ['"Full-Stack & AI Dev"', "s"], [",\n", ""],
+    ["  founder", "p"], [": ", ""], ['"HMGenX"', "s"], [",\n", ""],
+    ["  stack", "p"], [": [", ""], ['"Python"', "s"], [", ", ""], ['"Flutter"', "s"], [", ", ""], ['"React"', "s"], ["],\n", ""],
+    ["  shipped", "p"], [": ", ""], ["3", "n"], [" products,\n", ""],
+    ["  revenue", "p"], [": ", ""], ['"₹60k+"', "s"], [",\n", ""],
+    ["  build", "p"], [": ", ""], ["() => ", "f"], ['"real things"', "s"], ["\n", ""],
+    ["};", "k"],
+  ];
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const span = (t, c) => (c ? `<span class="${c}">${esc(t)}</span>` : esc(t));
+  let ti = 0, ci = 0, done = "";
+  function step() {
+    if (ti >= T.length) return;
+    const [text, cls] = T[ti];
+    ci++;
+    code.innerHTML = done + span(text.slice(0, ci), cls);
+    const justTyped = text[ci - 1];
+    if (ci >= text.length) { done += span(text, cls); ti++; ci = 0; }
+    setTimeout(step, justTyped === "\n" ? 110 : 14 + Math.random() * 26);
   }
-  window.addEventListener("resize", resize);
-  resize();
+  setTimeout(step, 600);
+})();
 
-  const clock = new THREE.Clock();
-  (function animate() {
-    requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
-    group.rotation.y = t * 0.12;
-    group.rotation.x = Math.sin(t * 0.18) * 0.18;
-    points.rotation.y = t * 0.025;
-    camera.position.x += (mx * 0.7 - camera.position.x) * 0.04;
-    camera.position.y += (-my * 0.45 - camera.position.y) * 0.04;
-    camera.lookAt(scene.position);
-    renderer.render(scene, camera);
-  })();
-}
-
-makeScene("scene", { particles: 750 });
-makeScene("scene2", { particles: 350 });
+/* ===========================================================
+   VANTA 3D network backgrounds (graceful fallback)
+   =========================================================== */
+(function initVanta() {
+  if (typeof VANTA === "undefined" || typeof THREE === "undefined") return;
+  const common = {
+    THREE: THREE,
+    mouseControls: true,
+    touchControls: true,
+    gyroControls: false,
+    minHeight: 200.0,
+    minWidth: 200.0,
+    scale: 1.0,
+    scaleMobile: 1.0,
+  };
+  if (document.getElementById("vanta-hero")) {
+    VANTA.NET({
+      el: "#vanta-hero",
+      ...common,
+      color: 0xc79a4f,
+      backgroundColor: 0x0e1118,
+      points: 12.0,
+      maxDistance: 23.0,
+      spacing: 16.0,
+      showDots: true,
+    });
+  }
+  if (document.getElementById("vanta-contact")) {
+    VANTA.NET({
+      el: "#vanta-contact",
+      ...common,
+      color: 0xb8924d,
+      backgroundColor: 0x0e1118,
+      points: 9.0,
+      maxDistance: 20.0,
+      spacing: 18.0,
+      showDots: false,
+    });
+  }
+})();
