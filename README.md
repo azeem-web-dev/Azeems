@@ -1,7 +1,7 @@
-# Rayyan Azeem Syed — Resume
+# Rayyan Azeem Syed — Portfolio & Resume
 
-A responsive, single-page resume website for **Rayyan Azeem Syed**, Full-Stack Developer
-and B.Tech CSE student.
+Personal portfolio website and resume for **Rayyan Azeem Syed** — Co-Founder & CEO of HMGenX,
+Full-Stack & AI Developer.
 
 🔗 **Live (after enabling GitHub Pages):** `https://azeem-web-dev.github.io/azeems/`
 
@@ -9,24 +9,20 @@ and B.Tech CSE student.
 
 | File | Purpose |
 |------|---------|
-| `index.html` | The resume markup |
-| `style.css` | Styling — screen, mobile, and print/PDF (A4) |
-| `Rayyan_Azeem_Syed_Resume.pdf` | Ready-to-send PDF version |
+| `index.html` | Portfolio homepage — classic/elegant design, 3D hero scene, scroll animations |
+| `portfolio.css` / `portfolio.js` | Portfolio styling and interactions (Three.js scenes, reveals, counters, tilt) |
+| `three.min.js` | Three.js r128 (vendored locally) |
+| `resume.html` / `resume-style.css` | Single-page A4 resume (print/PDF optimized) |
+| `Rayyan_Azeem_Syed_Resume.pdf` | Ready-to-send PDF resume |
 
 ## Highlights
 
-- **Flagship project:** OMR Scanner & Mark Report System — a real-time app (Python + OpenCV)
-  that scans JEE/EAMCET OMR sheets and generates mark reports. Deployed and sold to **2
-  institutions** (₹40,000 total), with a Certificate of Appreciation from Nakshatra IIT-JEE Academy.
-- Full-stack skill set: HTML5, CSS3, JavaScript, React.js, Python, MySQL/MongoDB, REST APIs.
+- **OMR Scanner & Mark Report System** — 98.6% accuracy, 2–3 papers/sec; deployed & sold to 2 institutions (₹40,000)
+- **Plot Map Detection System** — YOLO + CUDA, 99.2% accuracy, ~5,000 plots in 3s (client: Sri Bramharamba Real Estate)
+- **Lipi** — Flutter transliteration app for Indian scripts, built for Smart India Hackathon 2025 (PS #25155)
 
 ## How to use
 
-- **View locally:** open `index.html` in any browser.
-- **Save a fresh PDF:** open the page and click **Download PDF** (or `Ctrl/Cmd + P` → Save as PDF).
+- **View locally:** open `index.html` (portfolio) or `resume.html` (resume) in any browser.
+- **Fresh PDF:** open `resume.html` → click **Download PDF** (or `Ctrl/Cmd + P` → Save as PDF).
 - **Publish online (free):** repo **Settings → Pages → Branch: `main` / root**, then visit the URL above.
-
-## To-do / personalize
-
-- Add 1–2 more projects in the `index.html` "Projects" section (look for the `TODO` comment).
-- Swap in live links / GitHub repos for any practice projects.

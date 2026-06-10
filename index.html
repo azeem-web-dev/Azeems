@@ -3,236 +3,240 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rayyan Azeem Syed — Software Developer (Full-Stack &amp; AI)</title>
-  <meta name="description" content="Resume of Rayyan Azeem Syed — final-year B.Tech CSE student and Co-Founder & CEO of HMGenX, seeking a software developer placement. Built and deployed multiple revenue-generating AI products." />
+  <title>Rayyan Azeem Syed — Portfolio</title>
+  <meta name="description" content="Portfolio of Rayyan Azeem Syed — Co-Founder & CEO of HMGenX, Full-Stack & AI Developer. Builder of revenue-generating computer-vision products." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portfolio.css" />
 </head>
 <body>
-  <!-- Floating download button (hidden when printing) -->
-  <button class="download-btn no-print" onclick="window.print()" title="Save as PDF">
-    ⬇ Download PDF
-  </button>
 
-  <main class="resume" id="resume">
+  <!-- ============ NAV ============ -->
+  <nav class="nav" id="nav">
+    <a class="nav-brand" href="#home">R<span class="gold">A</span>S</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a class="nav-resume" href="Rayyan_Azeem_Syed_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+  </nav>
 
-    <!-- ============ HEADER ============ -->
-    <header class="header">
-      <div class="header-main">
-        <h1 class="name">Rayyan Azeem Syed</h1>
-        <p class="title">Software Developer · Full-Stack &amp; AI</p>
-      </div>
-      <ul class="contact">
-        <li><span class="ico">📍</span> Kandukur, Andhra Pradesh 523105</li>
-        <li><span class="ico">📞</span> <a href="tel:+919010030579">+91 90100 30579</a></li>
-        <li><span class="ico">✉️</span> <a href="mailto:ridahuda03@gmail.com">ridahuda03@gmail.com</a></li>
-        <li><span class="ico">in</span> <a href="https://www.linkedin.com/in/rayyanazeemsyed" target="_blank" rel="noopener">linkedin.com/in/rayyanazeemsyed</a></li>
-        <li><span class="ico">gh</span> <a href="https://github.com/azeem-web-dev" target="_blank" rel="noopener">github.com/azeem-web-dev</a></li>
-      </ul>
-    </header>
-
-    <div class="grid">
-      <!-- ============ LEFT COLUMN ============ -->
-      <div class="col-left">
-
-        <!-- OBJECTIVE -->
-        <section class="section">
-          <h2 class="section-title">Objective</h2>
-          <p class="summary">
-            Final-year B.Tech Computer Science student and Co-Founder &amp; CEO of HMGenX, seeking a
-            <strong>Software Developer role</strong> where I can apply hands-on full-stack and
-            AI / computer-vision experience. Have built, deployed, and sold
-            <strong>multiple revenue-generating products (₹60,000+)</strong> for real clients.
-          </p>
-        </section>
-
-        <!-- EXPERIENCE -->
-        <section class="section">
-          <h2 class="section-title">Experience</h2>
-
-          <article class="exp">
-            <div class="exp-head">
-              <h3 class="exp-role">Co-Founder, CEO &amp; Lead Developer</h3>
-              <span class="exp-date">2023 – Present</span>
-            </div>
-            <p class="exp-company">HMGenX</p>
-            <ul class="bullets">
-              <li>Lead a team building <strong>full-stack web, mobile &amp; desktop apps and AI software &amp; automation</strong> for real clients, owning delivery end-to-end.</li>
-              <li>Hands-on across the stack and computer vision (OpenCV, YOLO, CUDA); shipped paid projects generating <strong>₹60,000+ revenue</strong>.</li>
-            </ul>
-          </article>
-
-          <article class="exp">
-            <div class="exp-head">
-              <h3 class="exp-role">Front-end Development Intern</h3>
-              <span class="exp-date">Jul – Sep 2025</span>
-            </div>
-            <p class="exp-company">InLighnX Global Pvt. Ltd.</p>
-            <ul class="bullets">
-              <li>Built a <strong>browser-based live translator</strong> with real-time speech/text translation, voice input, TTS, and local history using <strong>JavaScript (Web Speech API), GSAP &amp; LocalStorage</strong>.</li>
-            </ul>
-          </article>
-
-          <article class="exp">
-            <div class="exp-head">
-              <h3 class="exp-role">Web Development Intern</h3>
-              <span class="exp-date">Apr – Jul 2025</span>
-            </div>
-            <p class="exp-company">Konic Technologies</p>
-            <ul class="bullets">
-              <li>Worked across <strong>front-end and back-end web technologies</strong>, contributing to real-time client projects.</li>
-            </ul>
-          </article>
-        </section>
-
-        <!-- PROJECTS -->
-        <section class="section">
-          <h2 class="section-title">Projects</h2>
-
-          <article class="project">
-            <div class="project-head">
-              <h3 class="project-name">Lipi — Bharat Script Transliteration App</h3>
-              <span class="badge">★ SIH 2025</span>
-            </div>
-            <p class="project-stack">Flutter · Google ML Kit · Tesseract / OpenCV OCR · REST API</p>
-            <ul class="bullets">
-              <li>Cross-platform mobile app for <strong>transliteration &amp; translation across Indian scripts and English</strong>, with <strong>camera-based OCR for signboards</strong>, offline on-device ML models, real-time typing, and auto script-detection (~78% transliteration accuracy). Built as a solution for <strong>Smart India Hackathon 2025 (Problem Statement #25155)</strong>.</li>
-            </ul>
-          </article>
-
-          <article class="project">
-            <div class="project-head">
-              <h3 class="project-name">OMR Scanner &amp; Mark Report System</h3>
-              <span class="badge">★ Deployed · ₹40,000</span>
-            </div>
-            <p class="project-stack">Python · OpenCV · MySQL · Desktop &amp; Mobile App</p>
-            <ul class="bullets">
-              <li>Real-time scanner for <strong>JEE &amp; EAMCET OMR sheets</strong> at <strong>98.6% accuracy and 2–3 papers/second</strong>, auto-generating detailed mark reports; <strong>deployed and sold to 2 institutions</strong> (₹20,000 each) with a <strong>Certificate of Appreciation from Nakshatra IIT-JEE Academy</strong>.</li>
-            </ul>
-          </article>
-
-          <article class="project">
-            <div class="project-head">
-              <h3 class="project-name">Plot Map Detection System</h3>
-              <span class="badge">★ Client · ₹20,000</span>
-            </div>
-            <p class="project-stack">Python · YOLO · OpenCV · CUDA (GPU) · PyQt6</p>
-            <ul class="bullets">
-              <li>For <strong>Sri Bramharamba Real Estate, Guntur</strong>: a <strong>GPU-accelerated YOLO</strong> system that detects plots from a map image at <strong>99.2% accuracy (~5,000 plots in 3s on a single GPU)</strong>, outputting <strong>precise coordinates and plot numbers</strong>; shipped as a <strong>PyQt6 desktop app</strong>.</li>
-            </ul>
-          </article>
-        </section>
-      </div>
-
-      <!-- ============ RIGHT COLUMN ============ -->
-      <div class="col-right">
-
-        <!-- TECHNICAL SKILLS -->
-        <section class="section">
-          <h2 class="section-title">Technical Skills</h2>
-
-          <div class="skill-group">
-            <h4 class="skill-label">Programming</h4>
-            <div class="tags">
-              <span class="tag">Python</span><span class="tag">C</span>
-              <span class="tag">JavaScript</span><span class="tag">Dart</span>
-            </div>
-          </div>
-
-          <div class="skill-group">
-            <h4 class="skill-label">Web &amp; Mobile</h4>
-            <div class="tags">
-              <span class="tag">HTML5</span><span class="tag">CSS3</span>
-              <span class="tag">React.js</span><span class="tag">Node.js</span>
-              <span class="tag">Flutter</span><span class="tag">Web Design</span>
-              <span class="tag">UI/UX</span><span class="tag">PyQt6</span>
-            </div>
-          </div>
-
-          <div class="skill-group">
-            <h4 class="skill-label">AI &amp; Machine Learning</h4>
-            <div class="tags">
-              <span class="tag">OpenCV</span><span class="tag">YOLO</span>
-              <span class="tag">PyTorch</span><span class="tag">TensorFlow</span>
-              <span class="tag">Pandas</span><span class="tag">CUDA / GPU</span>
-              <span class="tag">ML Kit</span>
-            </div>
-          </div>
-
-          <div class="skill-group">
-            <h4 class="skill-label">Databases &amp; Core CS</h4>
-            <div class="tags">
-              <span class="tag">MySQL</span><span class="tag">Supabase</span>
-              <span class="tag">Firebase</span><span class="tag">REST APIs</span>
-              <span class="tag">DSA</span><span class="tag">OOP</span>
-              <span class="tag">DBMS</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- TOOLS -->
-        <section class="section">
-          <h2 class="section-title">Tools Experienced</h2>
-          <div class="tags">
-            <span class="tag">Git</span><span class="tag">GitHub</span>
-            <span class="tag">Docker</span><span class="tag">Linux</span>
-            <span class="tag">Postman</span><span class="tag">VS Code</span>
-            <span class="tag">Android Studio</span>
-          </div>
-        </section>
-
-        <!-- CODING PROFILES -->
-        <section class="section">
-          <h2 class="section-title">Coding Profiles</h2>
-          <ul class="profile-list">
-            <li><span class="ico">LC</span> <a href="https://leetcode.com/u/Rayyan_Azeem/" target="_blank" rel="noopener">leetcode.com/u/Rayyan_Azeem</a></li>
-            <li><span class="ico">HR</span> <a href="https://www.hackerrank.com/YOUR_HANDLE" target="_blank" rel="noopener">hackerrank.com/your-handle</a></li>
-          </ul>
-        </section>
-
-        <!-- EDUCATION -->
-        <section class="section">
-          <h2 class="section-title">Education</h2>
-          <div class="edu">
-            <h4 class="edu-degree">B.Tech, Computer Science</h4>
-            <p class="edu-school">RISE Krishna Sai Prakasam, Valluru</p>
-            <p class="edu-meta">Expected 2027 · SGPA 8.44</p>
-          </div>
-          <div class="edu">
-            <h4 class="edu-degree">Intermediate (MPC)</h4>
-            <p class="edu-school">Narayana Junior College, Kandukur</p>
-            <p class="edu-meta">2023 · 95.3%</p>
-          </div>
-          <div class="edu">
-            <h4 class="edu-degree">SSC</h4>
-            <p class="edu-school">Narayana EM School, Kandukur</p>
-            <p class="edu-meta">2021 · 100%</p>
-          </div>
-        </section>
-
-        <!-- ACHIEVEMENTS -->
-        <section class="section">
-          <h2 class="section-title">Achievements</h2>
-          <ul class="bullets">
-            <li>Certificate of Appreciation — Nakshatra IIT-JEE Academy.</li>
-            <li>Multiple chess medals; district-level Kabaddi player.</li>
-          </ul>
-        </section>
-
-        <!-- LANGUAGES -->
-        <section class="section">
-          <h2 class="section-title">Languages</h2>
-          <ul class="lang-list">
-            <li><span>Urdu</span><span class="muted">Native</span></li>
-            <li><span>Hindi</span><span class="muted">B2</span></li>
-            <li><span>Telugu</span><span class="muted">B2</span></li>
-            <li><span>English</span><span class="muted">B1</span></li>
-          </ul>
-        </section>
+  <!-- ============ HERO ============ -->
+  <header class="hero" id="home">
+    <canvas id="scene"></canvas>
+    <div class="hero-inner">
+      <p class="hero-eyebrow reveal">Co-Founder &amp; CEO · HMGenX</p>
+      <h1 class="hero-name reveal">Rayyan <em>Azeem</em> Syed</h1>
+      <div class="hero-rule reveal"><span></span>✦<span></span></div>
+      <p class="hero-tag reveal">Full-Stack &amp; AI Developer — crafting computer-vision products
+        that real businesses pay for.</p>
+      <div class="hero-cta reveal">
+        <a class="btn btn-gold" href="#projects">View My Work</a>
+        <a class="btn btn-ghost" href="resume.html">Read Résumé</a>
       </div>
     </div>
+    <a class="hero-scroll" href="#about" aria-label="Scroll down"><span></span></a>
+  </header>
+
+  <main>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="container">
+        <p class="kicker reveal">01 — About</p>
+        <h2 class="title reveal">A student who ships <em>real products</em></h2>
+        <div class="about-grid">
+          <div class="about-text reveal">
+            <p>I'm a final-year B.Tech Computer Science student and the Co-Founder &amp; CEO of
+            <strong>HMGenX</strong>, where I lead a team building full-stack websites, mobile &amp;
+            desktop applications, and AI software for real clients.</p>
+            <p>My work lives in the real world — an OMR scanning system grading exams in two
+            institutions, a GPU-accelerated plot-detection engine serving a real-estate firm, and a
+            multilingual transliteration app built for Smart India Hackathon 2025.</p>
+            <p>I care about the full journey: an idea, a clean design, a robust build, and a
+            deployed product that someone is happy to pay for.</p>
+          </div>
+          <div class="about-stats">
+            <div class="stat reveal"><span class="stat-num" data-count="60">0</span><span class="stat-unit">k+</span><p>₹ client revenue</p></div>
+            <div class="stat reveal"><span class="stat-num" data-count="3">0</span><span class="stat-unit"></span><p>deployed products</p></div>
+            <div class="stat reveal"><span class="stat-num" data-count="2">0</span><span class="stat-unit"></span><p>internships</p></div>
+            <div class="stat reveal"><span class="stat-num" data-count="99">0</span><span class="stat-unit">%</span><p>best model accuracy</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section class="section section-alt" id="experience">
+      <div class="container">
+        <p class="kicker reveal">02 — Experience</p>
+        <h2 class="title reveal">Where I've <em>worked</em></h2>
+        <div class="timeline">
+          <article class="t-item reveal">
+            <div class="t-dot"></div>
+            <p class="t-date">2023 — Present</p>
+            <h3 class="t-role">Co-Founder, CEO &amp; Lead Developer</h3>
+            <p class="t-org">HMGenX</p>
+            <p class="t-desc">Leading a team delivering full-stack web, mobile &amp; desktop apps and
+            AI software &amp; automation for clients — owning everything from requirements to
+            deployment. Shipped multiple paid projects generating ₹60,000+ in revenue.</p>
+          </article>
+          <article class="t-item reveal">
+            <div class="t-dot"></div>
+            <p class="t-date">Jul — Sep 2025</p>
+            <h3 class="t-role">Front-end Development Intern</h3>
+            <p class="t-org">InLighnX Global Pvt. Ltd.</p>
+            <p class="t-desc">Built a browser-based live translator with real-time speech/text
+            translation, voice input, TTS and local history — JavaScript (Web Speech API), GSAP,
+            LocalStorage.</p>
+          </article>
+          <article class="t-item reveal">
+            <div class="t-dot"></div>
+            <p class="t-date">Apr — Jul 2025</p>
+            <h3 class="t-role">Web Development Intern</h3>
+            <p class="t-org">Konic Technologies</p>
+            <p class="t-desc">Worked across front-end and back-end web technologies, contributing to
+            real-time client projects.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section" id="projects">
+      <div class="container">
+        <p class="kicker reveal">03 — Selected Work</p>
+        <h2 class="title reveal">Products with <em>proof</em></h2>
+
+        <div class="projects">
+          <article class="card reveal" data-tilt>
+            <div class="card-top">
+              <span class="card-no">I</span>
+              <span class="card-badge">Deployed · ₹40,000</span>
+            </div>
+            <h3 class="card-name">OMR Scanner &amp; Mark Report System</h3>
+            <p class="card-desc">Real-time scanner for JEE &amp; EAMCET OMR sheets — OpenCV bubble
+            detection grading at <strong>98.6% accuracy, 2–3 papers per second</strong>, generating
+            detailed mark reports. Sold to two institutions; recognised with a Certificate of
+            Appreciation from Nakshatra IIT-JEE Academy.</p>
+            <p class="card-stack">Python · OpenCV · MySQL · Desktop &amp; Mobile</p>
+          </article>
+
+          <article class="card reveal" data-tilt>
+            <div class="card-top">
+              <span class="card-no">II</span>
+              <span class="card-badge">Client · ₹20,000</span>
+            </div>
+            <h3 class="card-name">Plot Map Detection System</h3>
+            <p class="card-desc">For Sri Bramharamba Real Estate, Guntur — a GPU-accelerated YOLO
+            engine that reads a plot map and returns the coordinates and number of every plot at
+            <strong>99.2% accuracy, ~5,000 plots in 3 seconds</strong>. Shipped as a PyQt6 desktop
+            application.</p>
+            <p class="card-stack">Python · YOLO · CUDA · OpenCV · PyQt6</p>
+          </article>
+
+          <article class="card reveal" data-tilt>
+            <div class="card-top">
+              <span class="card-no">III</span>
+              <span class="card-badge">SIH 2025</span>
+            </div>
+            <h3 class="card-name">Lipi — Bharat Script Transliteration</h3>
+            <p class="card-desc">A Flutter app that transliterates &amp; translates across Indian
+            scripts and English — camera OCR for signboards, offline on-device models, real-time
+            typing and auto script-detection. Built as a solution for Smart India Hackathon 2025
+            (PS #25155).</p>
+            <p class="card-stack">Flutter · ML Kit · Tesseract / OpenCV · REST API</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS ============ -->
+    <section class="section section-alt" id="skills">
+      <div class="container">
+        <p class="kicker reveal">04 — Capabilities</p>
+        <h2 class="title reveal">Technical <em>skills</em></h2>
+        <div class="skills">
+          <div class="skill-col reveal">
+            <h4>Programming</h4>
+            <ul><li>Python</li><li>C</li><li>JavaScript</li><li>Dart</li></ul>
+          </div>
+          <div class="skill-col reveal">
+            <h4>Web &amp; Mobile</h4>
+            <ul><li>HTML5 / CSS3</li><li>React.js</li><li>Node.js</li><li>Flutter</li><li>Web Design · UI/UX</li><li>PyQt6</li></ul>
+          </div>
+          <div class="skill-col reveal">
+            <h4>AI &amp; Machine Learning</h4>
+            <ul><li>OpenCV</li><li>YOLO</li><li>PyTorch</li><li>TensorFlow</li><li>Pandas</li><li>CUDA / GPU</li><li>ML Kit</li></ul>
+          </div>
+          <div class="skill-col reveal">
+            <h4>Data &amp; Tools</h4>
+            <ul><li>MySQL</li><li>Supabase</li><li>Firebase</li><li>REST APIs</li><li>Git / GitHub</li><li>Docker · Linux</li><li>Postman</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EDUCATION ============ -->
+    <section class="section" id="education">
+      <div class="container">
+        <p class="kicker reveal">05 — Education &amp; Honours</p>
+        <h2 class="title reveal">The <em>foundation</em></h2>
+        <div class="edu-grid">
+          <div class="edu-card reveal">
+            <h4>B.Tech — Computer Science</h4>
+            <p>RISE Krishna Sai Prakasam, Valluru</p>
+            <p class="edu-meta">Expected 2027 · SGPA 8.44</p>
+          </div>
+          <div class="edu-card reveal">
+            <h4>Intermediate — MPC</h4>
+            <p>Narayana Junior College, Kandukur</p>
+            <p class="edu-meta">2023 · 95.3%</p>
+          </div>
+          <div class="edu-card reveal">
+            <h4>SSC</h4>
+            <p>Narayana EM School, Kandukur</p>
+            <p class="edu-meta">2021 · 100%</p>
+          </div>
+        </div>
+        <ul class="honours reveal">
+          <li>Certificate of Appreciation — Nakshatra IIT-JEE Academy</li>
+          <li>Multiple chess tournament medals</li>
+          <li>District-level Kabaddi player</li>
+          <li>Languages — Urdu (native), Hindi, Telugu, English</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section section-dark" id="contact">
+      <canvas id="scene2"></canvas>
+      <div class="container contact-inner">
+        <p class="kicker reveal">06 — Contact</p>
+        <h2 class="title reveal">Let's build something <em>worth paying for</em></h2>
+        <a class="contact-mail reveal" href="mailto:ridahuda03@gmail.com">ridahuda03@gmail.com</a>
+        <p class="contact-phone reveal">+91 90100 30579 · Kandukur, Andhra Pradesh</p>
+        <div class="contact-links reveal">
+          <a href="https://www.linkedin.com/in/rayyanazeemsyed" target="_blank" rel="noopener">LinkedIn</a>
+          <span>·</span>
+          <a href="https://github.com/azeem-web-dev" target="_blank" rel="noopener">GitHub</a>
+          <span>·</span>
+          <a href="https://leetcode.com/u/Rayyan_Azeem/" target="_blank" rel="noopener">LeetCode</a>
+          <span>·</span>
+          <a href="Rayyan_Azeem_Syed_Resume.pdf" target="_blank" rel="noopener">Résumé PDF</a>
+        </div>
+      </div>
+      <footer class="footer">
+        <p>© 2026 Rayyan Azeem Syed — crafted with care.</p>
+      </footer>
+    </section>
   </main>
+
+  <script src="three.min.js"></script>
+  <script src="portfolio.js"></script>
 </body>
 </html>
