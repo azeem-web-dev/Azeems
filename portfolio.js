@@ -258,16 +258,39 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   root.add(monitor);
 
   // ---------- white-brick desk gear (auto-placed under the hands after the model loads) ----------
-  const brickMat = new THREE.MeshStandardMaterial({ color: 0xf2f2f4, roughness: 0.55, metalness: 0.05 });
-  const kbdL = meshAt(round(0.85, 0.16, 0.74), brickMat, -0.45, 0.22, 0.5);   // keyboard = two clean white bricks
-  const kbdR = meshAt(round(0.85, 0.16, 0.74), brickMat, 0.45, 0.22, 0.5);
-  const mouse = meshAt(round(0.44, 0.12, 0.58), brickMat, 2.0, 0.20, 0.45);   // mouse (white brick)
-  root.add(kbdL); root.add(kbdR); root.add(mouse);
-  const BR = window.BR = { kx: 1.25, ky: 0.35, kz: 0.53, gap: 0.46, mx: 2.6, my: 0.3, mz: 0.35 };
+  // ---------- proper keyboard + mouse (built from geometry, aligned under the hands) ----------
+  function buildKeyboard() {
+    const g = new THREE.Group();
+    const baseMat = new THREE.MeshStandardMaterial({ color: 0x23252b, roughness: 0.5, metalness: 0.35 });
+    const keyMat = new THREE.MeshStandardMaterial({ color: 0xdfe3ea, roughness: 0.6, metalness: 0.05 });
+    const W = 2.3, D = 0.98, baseH = 0.1;
+    g.add(new THREE.Mesh(round(W, baseH, D), baseMat));                       // base
+    const cols = 14, rows = 4, padX = 0.14, padZ = 0.12, gap = 0.035;
+    const kw = (W - padX * 2) / cols, kd = ((D - padZ * 2) * 0.78) / rows;
+    const key = (x, z, w) => g.add(meshAt(round(w - gap, 0.06, kd - gap), keyMat, x, baseH / 2 + 0.03, z));
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++)
+      key(-W / 2 + padX + kw * (c + 0.5), -D / 2 + padZ + kd * (r + 0.5), kw);
+    const zf = -D / 2 + padZ + kd * (rows + 0.5);
+    key(0, zf, kw * 6);                                                       // spacebar
+    key(-W / 2 + padX + kw * 2, zf, kw * 2.6); key(W / 2 - padX - kw * 2, zf, kw * 2.6);
+    return g;
+  }
+  function buildMouse() {
+    const g = new THREE.Group();
+    const mMat = new THREE.MeshStandardMaterial({ color: 0x2a2c32, roughness: 0.4, metalness: 0.3 });
+    const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 26, 18), mMat);
+    body.scale.set(0.36, 0.22, 0.56); body.position.y = 0.11; g.add(body);
+    g.add(meshAt(round(0.006, 0.02, 0.18), new THREE.MeshStandardMaterial({ color: 0x9aa0ad }), 0, 0.205, 0.1)); // split line
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 12), new THREE.MeshStandardMaterial({ color: 0x6b7280 }));
+    wheel.rotation.z = Math.PI / 2; wheel.position.set(0, 0.22, 0.18); g.add(wheel);
+    return g;
+  }
+  const keyboard = buildKeyboard(); root.add(keyboard);
+  const mouseObj = buildMouse(); root.add(mouseObj);
+  const BR = window.BR = { kbx: 0.78, kby: 0.22, kbz: 0.58, kbrot: 0.05, mx: 2.25, my: 0.16, mz: 0.4, mrot: -0.2 };
   function applyBricks() {
-    kbdL.position.set(BR.kx - BR.gap, BR.ky, BR.kz);
-    kbdR.position.set(BR.kx + BR.gap, BR.ky, BR.kz);
-    mouse.position.set(BR.mx, BR.my, BR.mz);
+    keyboard.position.set(BR.kbx, BR.kby, BR.kbz); keyboard.rotation.y = BR.kbrot;
+    mouseObj.position.set(BR.mx, BR.my, BR.mz); mouseObj.rotation.y = BR.mrot;
   }
   window.__applyBricks = applyBricks; applyBricks();
   // a couple of tidy props on the left so the desk isn't bare
@@ -286,13 +309,11 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const meshMat = new THREE.MeshStandardMaterial({ map: meshTex, transparent: true, opacity: 0.95, color: 0x5b6070, roughness: 0.8, metalness: 0.25, side: THREE.DoubleSide });
     const cx = 0.1, bz = 1.55;
     g.add(meshAt(round(1.55, 0.22, 1.4), frameMat, cx, 0.02, bz - 0.4));                          // seat
-    // mid-back rest: thin frame + ergonomic mesh insert (kept low so the terminal stays clear)
+    // low-back task rest: thin frame + ergonomic mesh insert (kept below head height so the head shows)
     const back = new THREE.Group();
-    back.add(meshAt(round(1.6, 1.9, 0.1), frameMat, 0, 0, 0.02));                                 // outer frame
-    back.add(meshAt(round(1.3, 1.5, 0.14), meshMat, 0, -0.05, 0));                                // mesh insert
-    back.position.set(cx, 0.98, bz + 0.16); back.rotation.x = 0.12; g.add(back);
-    g.add(meshAt(round(0.1, 0.34, 0.1), frameMat, cx, 1.92, bz + 0.34));                          // headrest post
-    g.add(meshAt(round(0.95, 0.4, 0.22), frameMat, cx, 2.12, bz + 0.34));                         // headrest
+    back.add(meshAt(round(1.55, 1.5, 0.1), frameMat, 0, 0, 0.02));                                // outer frame
+    back.add(meshAt(round(1.28, 1.18, 0.14), meshMat, 0, -0.04, 0));                              // mesh insert
+    back.position.set(cx, 0.82, bz + 0.16); back.rotation.x = 0.12; g.add(back);
     [-1.0, 1.0].forEach((dx) => {                                                                 // armrests
       g.add(meshAt(round(0.14, 0.5, 0.14), frameMat, cx + dx, 0.42, bz - 0.5));
       g.add(meshAt(round(0.17, 0.14, 1.0), frameMat, cx + dx, 0.72, bz - 0.75));
@@ -309,18 +330,27 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }
   root.add(buildChair());
 
-  // ---------- hanging pendant lamp (light from above) + pull-cord on/off ----------
-  const LX = 0.2, LY = 3.55, LZ = 0.1;
+  // ---------- hanging pendant lamp (smaller shade, strong glow) + pull-cord on/off ----------
+  const LX = 0.2, LY = 3.35, LZ = 0.15;
   const shadeMat = new THREE.MeshStandardMaterial({ color: 0x14151a, roughness: 0.4, metalness: 0.7, side: THREE.DoubleSide });
-  const shadeInMat = new THREE.MeshStandardMaterial({ color: 0xfff3da, emissive: 0xffdf9e, emissiveIntensity: 1, roughness: 0.9, side: THREE.BackSide });
-  const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff7e6, emissive: 0xffd98a, emissiveIntensity: 2.2 });
-  root.add(meshAt(new THREE.CylinderGeometry(0.03, 0.03, 3.2, 8), matMetal, LX, LY + 1.7, LZ));     // cord up out of frame
-  root.add(meshAt(new THREE.CylinderGeometry(0.09, 0.13, 0.14, 14), matMetal, LX, LY + 0.4, LZ));   // ceiling cap
-  const shade = new THREE.Mesh(new THREE.ConeGeometry(0.66, 0.74, 30, 1, true), shadeMat); shade.position.set(LX, LY, LZ); root.add(shade);
-  const shadeIn = new THREE.Mesh(new THREE.ConeGeometry(0.63, 0.7, 30, 1, true), shadeInMat); shadeIn.position.set(LX, LY, LZ); root.add(shadeIn);
-  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 18), bulbMat); bulb.position.set(LX, LY - 0.2, LZ); root.add(bulb);
+  const shadeInMat = new THREE.MeshStandardMaterial({ color: 0xfff3da, emissive: 0xffe6b0, emissiveIntensity: 1.4, roughness: 0.9, side: THREE.BackSide });
+  const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff7e6, emissive: 0xffd98a, emissiveIntensity: 4.0 });
+  root.add(meshAt(new THREE.CylinderGeometry(0.024, 0.024, 3.2, 8), matMetal, LX, LY + 1.7, LZ));   // cord up out of frame
+  root.add(meshAt(new THREE.CylinderGeometry(0.07, 0.1, 0.12, 14), matMetal, LX, LY + 0.32, LZ));   // ceiling cap
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.5, 30, 1, true), shadeMat); shade.position.set(LX, LY, LZ); root.add(shade);
+  const shadeIn = new THREE.Mesh(new THREE.ConeGeometry(0.4, 0.47, 30, 1, true), shadeInMat); shadeIn.position.set(LX, LY, LZ); root.add(shadeIn);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 18, 18), bulbMat); bulb.position.set(LX, LY - 0.16, LZ); root.add(bulb);
+  // additive glow halo around the bulb for a strong glowing look
+  const glowTex = (() => {
+    const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d");
+    const gr = x.createRadialGradient(64, 64, 1, 64, 64, 64);
+    gr.addColorStop(0, "rgba(255,243,210,0.95)"); gr.addColorStop(0.35, "rgba(255,224,160,0.45)"); gr.addColorStop(1, "rgba(255,224,160,0)");
+    x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+  })();
+  const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+  glowSprite.position.set(LX, LY - 0.14, LZ); glowSprite.scale.set(1.5, 1.5, 1); root.add(glowSprite);
   // pull cord + knob (click to toggle)
-  const cordGrp = new THREE.Group(); cordGrp.position.set(LX + 0.52, LY - 0.15, LZ); root.add(cordGrp);
+  const cordGrp = new THREE.Group(); cordGrp.position.set(LX + 0.36, LY - 0.12, LZ); root.add(cordGrp);
   cordGrp.add(meshAt(new THREE.CylinderGeometry(0.011, 0.011, 0.52, 6), matMetal, 0, -0.26, 0));
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 12), new THREE.MeshStandardMaterial({ color: 0xe2e4ea, metalness: 0.6, roughness: 0.3 }));
   knob.position.set(0, -0.56, 0); knob.userData.pull = true; cordGrp.add(knob);
@@ -386,19 +416,22 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const fill = new THREE.DirectionalLight(0xcdd6e6, 0.5); fill.position.set(3.5, 2.5, 8); scene.add(fill); // front fill reveals the chair form
   const backRim = new THREE.DirectionalLight(0x7d93ff, 1.0); backRim.position.set(-4, 6, -5); scene.add(backRim);
 
-  // pendant lamp lights — a down-cone over the desk + a soft up-spill (light in two directions)
-  const lampSpot = new THREE.SpotLight(0xffdfac, 0, 30, 0.66, 0.7, 1.3);
-  lampSpot.position.set(LX, LY - 0.2, LZ); lampSpot.target.position.set(0.15, 0.2, 0.5);
+  // pendant lamp lights — a strong, glowing down-pool over the desk + a soft up-spill
+  const lampSpot = new THREE.SpotLight(0xffe1b0, 0, 32, 0.62, 0.55, 1.2);
+  lampSpot.position.set(LX, LY - 0.16, LZ); lampSpot.target.position.set(0.2, 0.2, 0.5);
   scene.add(lampSpot); scene.add(lampSpot.target);
+  const lampPool = new THREE.PointLight(0xffe6bb, 0, 7, 2); lampPool.position.set(0.2, 1.1, 0.5); scene.add(lampPool); // fills the desk pool
   const lampUp = new THREE.PointLight(0xffe2b0, 0, 9, 2); lampUp.position.set(LX, LY + 0.3, LZ); scene.add(lampUp);
 
   let lampOn = true;
   function setLamp(on) {
     lampOn = on;
-    lampSpot.intensity = on ? 4.0 : 0;
-    lampUp.intensity = on ? 0.4 : 0;
-    bulbMat.emissiveIntensity = on ? 2.2 : 0.06;
-    shadeInMat.emissiveIntensity = on ? 1.0 : 0.05;
+    lampSpot.intensity = on ? 9.0 : 0;
+    lampPool.intensity = on ? 1.4 : 0;
+    lampUp.intensity = on ? 0.5 : 0;
+    bulbMat.emissiveIntensity = on ? 4.0 : 0.06;
+    shadeInMat.emissiveIntensity = on ? 1.4 : 0.05;
+    glowSprite.visible = on;
     ambient.intensity = on ? 0.5 : 0.16;
     fill.intensity = on ? 0.5 : 0.32;
     rim.intensity = on ? 0.8 : 0.45;
@@ -449,7 +482,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const sway = Math.sin(t * 0.8) * 0.02;
     cordGrp.rotation.z = sway * 2 - (pullT > 0 ? Math.sin((0.45 - pullT) * 32) * 0.13 : 0);
     if (pullT > 0) pullT = Math.max(0, pullT - dt);
-    if (lampOn) { const fl = 1 + Math.sin(t * 22) * 0.015; bulbMat.emissiveIntensity = 2.2 * fl; lampSpot.intensity = 4.0 * fl; }
+    if (lampOn) { const fl = 1 + Math.sin(t * 22) * 0.02; bulbMat.emissiveIntensity = 4.0 * fl; lampSpot.intensity = 9.0 * fl; }
     camera.position.x += (camBase.x + mx * 1.4 - camera.position.x) * 0.05;
     camera.position.y += (camBase.y - my * 0.9 - camera.position.y) * 0.05;
     camera.lookAt(root.position.x + lookTarget.x, lookTarget.y, lookTarget.z);
