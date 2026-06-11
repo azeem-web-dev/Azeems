@@ -161,97 +161,84 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 })();
 
 /* ===========================================================
-   3D hero — anime character showcase (game character-select)
+   3D hero — interactive neural-network particle field
    =========================================================== */
-(function characterScene() {
-  if (typeof THREE === "undefined" || typeof THREE.OBJLoader === "undefined" || typeof THREE.MTLLoader === "undefined") return;
+(function heroScene() {
+  if (typeof THREE === "undefined") return;
   const canvas = document.getElementById("deskscene");
   if (!canvas) return;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x0b0b0d, 1);
-  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0x0b0b0d, 10, 28);
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-  const camBase = new THREE.Vector3(0, 1.95, 6.7);
-  camera.position.copy(camBase);
-  const lookTarget = new THREE.Vector3(0, 2.05, 0);
-  const mk = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); return m; };
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+  camera.position.z = 15;
 
-  /* ---- dramatic character lighting ---- */
-  scene.add(new THREE.AmbientLight(0x3a4150, 0.8));
-  const key = new THREE.DirectionalLight(0xfff0dc, 1.55); key.position.set(-5, 7, 6); scene.add(key);
-  const rimBlue = new THREE.DirectionalLight(0x5a7cff, 2.0); rimBlue.position.set(7, 4, -5); scene.add(rimBlue);
-  const rimRed = new THREE.DirectionalLight(0xff3a3a, 1.3); rimRed.position.set(-7, 3, -4); scene.add(rimRed);
-  const front = new THREE.DirectionalLight(0xffffff, 0.55); front.position.set(2, 2.5, 9); scene.add(front);
+  // soft round sprite for particles
+  const sc = document.createElement("canvas"); sc.width = sc.height = 64;
+  const sx = sc.getContext("2d");
+  const g = sx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.4, "rgba(255,255,255,0.6)"); g.addColorStop(1, "rgba(255,255,255,0)");
+  sx.fillStyle = g; sx.fillRect(0, 0, 64, 64);
+  const sprite = new THREE.CanvasTexture(sc);
 
-  /* ---- backdrop halo (additive radial glow) ---- */
-  const gc = document.createElement("canvas"); gc.width = gc.height = 256;
-  const gx = gc.getContext("2d");
-  const grd = gx.createRadialGradient(128, 128, 8, 128, 128, 128);
-  grd.addColorStop(0, "rgba(96,116,210,0.6)"); grd.addColorStop(0.5, "rgba(60,72,150,0.22)"); grd.addColorStop(1, "rgba(0,0,0,0)");
-  gx.fillStyle = grd; gx.fillRect(0, 0, 256, 256);
-  const halo = mk(new THREE.PlaneGeometry(14, 14), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }), 0, 2.6, -4);
-  scene.add(halo);
+  const N = 200, R = 7, group = new THREE.Group(); scene.add(group);
+  const pos = new Float32Array(N * 3), vel = [];
+  for (let i = 0; i < N; i++) {
+    const theta = Math.random() * Math.PI * 2, phi = Math.acos(2 * Math.random() - 1), rr = R * (0.45 + Math.random() * 0.55);
+    pos[i * 3] = rr * Math.sin(phi) * Math.cos(theta);
+    pos[i * 3 + 1] = rr * Math.sin(phi) * Math.sin(theta) * 0.8;
+    pos[i * 3 + 2] = rr * Math.cos(phi);
+    vel.push([(Math.random() - 0.5) * 0.012, (Math.random() - 0.5) * 0.012, (Math.random() - 0.5) * 0.012]);
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ map: sprite, color: 0xffffff, size: 0.34, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending }));
+  group.add(points);
 
-  /* ---- pedestal + spinning glow ring ---- */
-  scene.add(mk(new THREE.CylinderGeometry(2.1, 2.4, 0.3, 56), new THREE.MeshStandardMaterial({ color: 0x111218, roughness: 0.5, metalness: 0.6 }), 0, 0.0, 0));
-  scene.add(mk(new THREE.CylinderGeometry(1.75, 1.75, 0.06, 56), new THREE.MeshStandardMaterial({ color: 0x1b1d26, roughness: 0.3, metalness: 0.7 }), 0, 0.17, 0));
-  const ringMat = new THREE.MeshStandardMaterial({ color: 0x5a7cff, emissive: 0x5a7cff, emissiveIntensity: 1.5, roughness: 0.4 });
-  const ringGroup = new THREE.Group(); scene.add(ringGroup);
-  const ring = mk(new THREE.TorusGeometry(1.95, 0.045, 16, 80), ringMat, 0, 0.2, 0); ring.rotation.x = Math.PI / 2; ringGroup.add(ring);
+  const maxLines = N * 8, linePos = new Float32Array(maxLines * 3);
+  const lineGeo = new THREE.BufferGeometry();
+  lineGeo.setAttribute("position", new THREE.BufferAttribute(linePos, 3));
+  const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0xaab2c8, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending }));
+  group.add(lines);
 
-  /* ---- the character (OBJ + textures) ---- */
-  const charGroup = new THREE.Group(); scene.add(charGroup);
-  let charReady = false;
-  const CHAR = window.CHAR = { ry: 0, x: 0, y: 0.2, scale: 3.7 };
-  function applyChar() { charGroup.rotation.y = CHAR.ry; charGroup.position.set(CHAR.x, CHAR.y, 0); }
-  window.__applyChar = applyChar; applyChar();
-
-  const mtl = new THREE.MTLLoader(); mtl.setPath("character/");
-  mtl.load("Madara_Uchiha.mtl", (mats) => {
-    mats.preload();
-    const ol = new THREE.OBJLoader(); ol.setMaterials(mats); ol.setPath("character/");
-    ol.load("Madara_Uchiha.obj", (o) => {
-      o.traverse((m) => {
-        if (!m.isMesh) return;
-        const fix = (mt) => { if (mt.map) { mt.color.setRGB(1, 1, 1); mt.map.encoding = THREE.sRGBEncoding; } if ("shininess" in mt) mt.shininess = 8; if (mt.specular) mt.specular.setRGB(0.05, 0.05, 0.05); mt.needsUpdate = true; };
-        Array.isArray(m.material) ? m.material.forEach(fix) : fix(m.material);
-      });
-      const box = new THREE.Box3().setFromObject(o), sz = box.getSize(new THREE.Vector3()), ctr = box.getCenter(new THREE.Vector3());
-      o.position.set(-ctr.x, -box.min.y, -ctr.z);     // centre x/z, feet on the floor
-      const wrap = new THREE.Group(); wrap.add(o); wrap.scale.setScalar(4.0 / sz.y);
-      charGroup.add(wrap);
-      window.__model = o; charReady = true;
-    });
-  });
-
-  /* ---- interaction + render loop ---- */
   let mx = 0, my = 0;
   window.addEventListener("mousemove", (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; });
   function resize() {
     const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    lookTarget.x = w > 980 ? -1.9 : 0;   // push the figure to the right, clear of the hero text
+    group.position.x = w > 980 ? 4.0 : 0;   // sit to the right, clear of the hero text
   }
   window.addEventListener("resize", resize); resize();
 
-  const clock = new THREE.Clock();
+  const clock = new THREE.Clock(), R2 = R * R, maxD2 = 2.3 * 2.3;
   (function animate() {
     requestAnimationFrame(animate);
     const t = clock.elapsedTime;
-    if (charReady) {
-      charGroup.rotation.y = CHAR.ry + Math.sin(t * 0.4) * 0.2 + mx * 0.55;   // gentle sway + mouse parallax
-      charGroup.position.y = CHAR.y + Math.sin(t * 0.9) * 0.04;               // subtle float
+    for (let i = 0; i < N; i++) {
+      const k = i * 3; pos[k] += vel[i][0]; pos[k + 1] += vel[i][1]; pos[k + 2] += vel[i][2];
+      const r2 = pos[k] * pos[k] + pos[k + 1] * pos[k + 1] + pos[k + 2] * pos[k + 2];
+      if (r2 > R2) { const inv = 1 / Math.sqrt(r2), nx = pos[k] * inv, ny = pos[k + 1] * inv, nz = pos[k + 2] * inv;
+        const dot = vel[i][0] * nx + vel[i][1] * ny + vel[i][2] * nz;
+        vel[i][0] -= 2 * dot * nx; vel[i][1] -= 2 * dot * ny; vel[i][2] -= 2 * dot * nz; }
     }
-    ringGroup.rotation.y = t * 0.35;
-    ringMat.emissiveIntensity = 1.4 + Math.sin(t * 2) * 0.45;
-    camera.position.x += (mx * 0.8 - camera.position.x) * 0.05;
-    camera.position.y += (camBase.y - my * 0.6 - camera.position.y) * 0.05;
-    camera.lookAt(lookTarget.x, lookTarget.y, lookTarget.z);
+    pGeo.attributes.position.needsUpdate = true;
+    let li = 0;
+    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+      const a = i * 3, b = j * 3, dx = pos[a] - pos[b], dy = pos[a + 1] - pos[b + 1], dz = pos[a + 2] - pos[b + 2];
+      if (dx * dx + dy * dy + dz * dz < maxD2 && li < maxLines - 2) {
+        linePos[li * 3] = pos[a]; linePos[li * 3 + 1] = pos[a + 1]; linePos[li * 3 + 2] = pos[a + 2]; li++;
+        linePos[li * 3] = pos[b]; linePos[li * 3 + 1] = pos[b + 1]; linePos[li * 3 + 2] = pos[b + 2]; li++;
+      }
+    }
+    lineGeo.setDrawRange(0, li); lineGeo.attributes.position.needsUpdate = true;
+    group.rotation.y = t * 0.06 + mx * 0.6;
+    group.rotation.x = my * 0.4;
+    camera.position.x += (mx * 2.5 - camera.position.x) * 0.04;
+    camera.position.y += (-my * 1.8 - camera.position.y) * 0.04;
+    camera.lookAt(group.position.x * 0.5, 0, 0);
     renderer.render(scene, camera);
   })();
 })();
