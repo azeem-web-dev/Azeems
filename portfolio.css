@@ -100,14 +100,22 @@ em { font-style: normal; }
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
   background:
     linear-gradient(90deg, rgba(11,11,13,0.92) 0%, rgba(11,11,13,0.6) 38%, rgba(11,11,13,0) 70%),
-    linear-gradient(0deg, var(--bg) 0%, rgba(255,255,255,0.88) 7%, rgba(255,255,255,0.45) 16%, rgba(255,255,255,0) 30%);
+    linear-gradient(0deg, rgba(11,11,13,0.4) 0%, rgba(11,11,13,0) 22%);
 }
-/* soft, slightly blurred seam so the dark hero melts into the white section below */
+/* frosted-glass seam — the dark hero dissolves into a pane of glass that
+   melts into the white section below (same glassmorphism as the cards) */
 .hero::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 16vh; z-index: 1;
-  pointer-events: none; backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
-  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 45%, transparent 100%);
-  mask-image: linear-gradient(to top, #000 0%, rgba(0,0,0,0.6) 45%, transparent 100%);
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32vh; z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.18) 38%,
+    rgba(255,255,255,0.55) 70%,
+    rgba(255,255,255,0.85) 100%);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  -webkit-mask-image: linear-gradient(to top, #000 68%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 68%, transparent 100%);
 }
 .hero-inner { position: relative; z-index: 2; max-width: 1180px; margin: 0 auto; padding: 0 48px; width: 100%; pointer-events: none; }
 .hero-inner a, .hero-inner button { pointer-events: auto; }
