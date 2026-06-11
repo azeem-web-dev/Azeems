@@ -279,20 +279,29 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const g = new THREE.Group();
     const mMat = new THREE.MeshStandardMaterial({ color: 0x2a2c32, roughness: 0.4, metalness: 0.3 });
     const body = new THREE.Mesh(new THREE.SphereGeometry(0.5, 26, 18), mMat);
-    body.scale.set(0.36, 0.22, 0.56); body.position.y = 0.11; g.add(body);
-    g.add(meshAt(round(0.006, 0.02, 0.18), new THREE.MeshStandardMaterial({ color: 0x9aa0ad }), 0, 0.205, 0.1)); // split line
-    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.05, 12), new THREE.MeshStandardMaterial({ color: 0x6b7280 }));
-    wheel.rotation.z = Math.PI / 2; wheel.position.set(0, 0.22, 0.18); g.add(wheel);
+    body.scale.set(0.46, 0.26, 0.72); body.position.y = 0.13; g.add(body);
+    g.add(meshAt(round(0.008, 0.02, 0.22), new THREE.MeshStandardMaterial({ color: 0x9aa0ad }), 0, 0.25, 0.12)); // split line
+    const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 12), new THREE.MeshStandardMaterial({ color: 0x6b7280 }));
+    wheel.rotation.z = Math.PI / 2; wheel.position.set(0, 0.26, 0.22); g.add(wheel);
     return g;
   }
   const keyboard = buildKeyboard(); root.add(keyboard);
   const mouseObj = buildMouse(); root.add(mouseObj);
-  const BR = window.BR = { kbx: 0.78, kby: 0.22, kbz: 0.58, kbrot: 0.05, mx: 2.25, my: 0.16, mz: 0.4, mrot: -0.2 };
+  const BR = window.BR = { kbx: 0.7, kby: 0.22, kbz: 0.55, kbrot: 0.03, mx: 2.3, my: 0.18, mz: 0.42, mrot: -0.25 };
   function applyBricks() {
     keyboard.position.set(BR.kbx, BR.kby, BR.kbz); keyboard.rotation.y = BR.kbrot;
     mouseObj.position.set(BR.mx, BR.my, BR.mz); mouseObj.rotation.y = BR.mrot;
   }
   window.__applyBricks = applyBricks; applyBricks();
+
+  // ---------- hair (so the figure reads as a person, not a bare mannequin) ----------
+  const hairMat = new THREE.MeshStandardMaterial({ color: 0x15120f, roughness: 0.78, metalness: 0.04 });
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(0.3, 28, 22), hairMat);
+  root.add(hair);
+  const HAIR = window.HAIR = { x: 0.27, y: 1.36, z: 0.82, s: 1.0, sx: 1.05, sy: 1.0, sz: 1.2 };
+  function applyHair() { hair.position.set(HAIR.x, HAIR.y, HAIR.z); hair.scale.set(HAIR.s * HAIR.sx, HAIR.s * HAIR.sy, HAIR.s * HAIR.sz); }
+  window.__applyHair = applyHair; applyHair();
+
   // a couple of tidy props on the left so the desk isn't bare
   root.add(meshAt(new THREE.CylinderGeometry(0.22, 0.26, 0.08, 16), matMetal, -2.6, 0.18, -0.5));   // coaster
   root.add(meshAt(new THREE.CylinderGeometry(0.16, 0.14, 0.34, 16), matMetal, -2.55, 0.34, -0.5));  // mug
@@ -314,10 +323,6 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     back.add(meshAt(round(1.55, 1.5, 0.1), frameMat, 0, 0, 0.02));                                // outer frame
     back.add(meshAt(round(1.28, 1.18, 0.14), meshMat, 0, -0.04, 0));                              // mesh insert
     back.position.set(cx, 0.82, bz + 0.16); back.rotation.x = 0.12; g.add(back);
-    [-1.0, 1.0].forEach((dx) => {                                                                 // armrests
-      g.add(meshAt(round(0.14, 0.5, 0.14), frameMat, cx + dx, 0.42, bz - 0.5));
-      g.add(meshAt(round(0.17, 0.14, 1.0), frameMat, cx + dx, 0.72, bz - 0.75));
-    });
     g.rotation.y = -0.13;                                                                         // slight 3/4 angle
     g.add(meshAt(new THREE.CylinderGeometry(0.13, 0.15, 1.0, 14), frameMat, cx, -0.62, bz - 0.4)); // gas lift
     for (let i = 0; i < 5; i++) {                                                                 // 5-star base + castors
@@ -365,13 +370,13 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     spine: [0.30, 0, 0], spine1: [0.16, 0, 0], spine2: [0.10, 0, 0],
     neck: [0.12, 0, 0], head: [0.24, 0, 0],
     lShoulder: [0, 0, 0], rShoulder: [0, 0, 0],
-    lArm: [0.12, 0.28, 1.70], rArm: [0.12, -0.28, -1.70],
-    lFore: [0.0, 0.70, 1.00], rFore: [0.0, -0.70, -1.00],
-    lHand: [-0.50, 0.10, 0.0], rHand: [-0.50, -0.10, 0.0],
-    fingerCurl: 0.5, fingerAxis: "x",
+    lArm: [0.08, 0.22, 1.72], rArm: [0.08, -0.22, -1.72],
+    lFore: [0.0, 1.20, 0.45], rFore: [0.0, -1.20, -0.45],
+    lHand: [-0.65, 0.12, 0.05], rHand: [-0.55, -0.12, 0.0],
+    fingerCurl: 0.62, fingerAxis: "x",
   };
   let bones = null, fingersL = [], fingersR = [], baseHandL = 0, baseHandR = 0, charReady = false;
-  const charMat = new THREE.MeshStandardMaterial({ color: 0x34373f, roughness: 0.45, metalness: 0.45 });
+  const charMat = new THREE.MeshStandardMaterial({ color: 0x3b3e46, roughness: 0.95, metalness: 0.0 }); // matte cloth, not metal
   const pivot = new THREE.Group(); pivot.rotation.y = Math.PI; root.add(pivot); // face the monitor
 
   function applyPose(model) {
