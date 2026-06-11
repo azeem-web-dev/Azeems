@@ -266,30 +266,76 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(9, 7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
   glow.position.set(0, 2.1, -1.0); root.add(glow);
 
-  root.add(meshAt(round(1.9, 0.07, 0.6), matLight, 0, 0.18, 0.5));      // keyboard
-  root.add(meshAt(new THREE.CylinderGeometry(0.16, 0.14, 0.34, 16), matLight, 2.1, 0.32, 0.5)); // mug
+  root.add(meshAt(round(3.0, 0.07, 0.72), matLight, 0.4, 0.2, 0.55));   // keyboard (wide, under the hands)
+  root.add(meshAt(round(0.42, 0.05, 0.6), matLight, 2.3, 0.2, 0.5));    // mouse + pad
+  root.add(meshAt(new THREE.CylinderGeometry(0.16, 0.14, 0.34, 16), matLight, 2.9, 0.34, -0.3)); // mug (moved back)
   root.add(meshAt(new THREE.CylinderGeometry(0.22, 0.26, 0.08, 16), matMetal, -2.5, 0.18, -0.6));
   const lampArm = meshAt(round(0.07, 1.2, 0.07), matMetal, -2.5, 0.78, -0.6); lampArm.rotation.z = 0.5; root.add(lampArm);
   root.add(meshAt(new THREE.ConeGeometry(0.26, 0.34, 16), matMetal, -2.95, 1.3, -0.6));
-  root.add(meshAt(new THREE.CylinderGeometry(0.2, 0.16, 0.34, 12), matMetal, 2.7, 0.32, -0.7));
-  [[0, 0.7], [0.16, 0.62], [-0.16, 0.62]].forEach(([dx, dy]) => root.add(meshAt(new THREE.IcosahedronGeometry(0.22, 0), matLight, 2.7 + dx, 0.32 + dy, -0.7)));
+  root.add(meshAt(new THREE.CylinderGeometry(0.2, 0.16, 0.34, 12), matMetal, -1.9, 0.32, -0.75)); // pen pot (left)
+  [[0, 0.7], [0.16, 0.62], [-0.16, 0.62]].forEach(([dx, dy]) => root.add(meshAt(new THREE.IcosahedronGeometry(0.2, 0), matLight, -1.9 + dx, 0.32 + dy, -0.75)));
   root.add(meshAt(round(1.7, 1.7, 0.2), matChair, 0, 1.0, 2.05));
 
-  // developer (back / three-quarter)
-  const person = new THREE.Group(); person.position.set(0.1, 0, 1.35); person.scale.setScalar(1.02);
-  const torso = meshAt(round(1.3, 1.5, 0.68), matBody, 0, 1.3, 0); torso.rotation.x = -0.14; person.add(torso);
-  const shoulders = meshAt(round(1.7, 0.5, 0.74), matBody, 0, 2.05, -0.06); person.add(shoulders);
-  person.add(meshAt(new THREE.CylinderGeometry(0.17, 0.19, 0.25, 12), matSkin, 0, 2.32, -0.04));
-  const head = meshAt(new THREE.SphereGeometry(0.36, 24, 24), matSkin, 0, 2.68, -0.02); person.add(head);
-  const hair = meshAt(new THREE.SphereGeometry(0.39, 24, 24), matBody, 0, 2.76, 0.04); hair.scale.set(1, 0.95, 1.08); person.add(hair);
-  const armL = meshAt(round(0.28, 1.0, 0.28), matBody, -0.66, 1.6, 0.4); armL.rotation.x = 0.98; person.add(armL);
-  const armR = meshAt(round(0.28, 1.0, 0.28), matBody, 0.66, 1.6, 0.4); armR.rotation.x = 0.98; person.add(armR);
-  root.add(person);
+  // desk modesty front panel — hides the seated lower body
+  root.add(meshAt(round(6.6, 1.75, 0.18), matDesk, 0, -0.8, 1.5));
 
-  scene.add(new THREE.AmbientLight(0x33343c, 0.8));
-  const screenLight = new THREE.PointLight(0xffffff, 2.8, 16, 2); screenLight.position.set(0, 2.0, -0.2); scene.add(screenLight);
-  const rim = new THREE.DirectionalLight(0xaab4c8, 0.9); rim.position.set(6, 6, 7); scene.add(rim);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.35); fill.position.set(-4, 4, 6); scene.add(fill);
+  /* ---- developer: a REAL rigged character (Xbot), posed & typing ---- */
+  // tweak live in console via window.POSE + window.__applyPose()
+  const POSE = window.POSE = {
+    pos: [0.15, -2.2, 0.88], scale: 4.4,
+    spine: [0.24, 0, 0], spine1: [0.14, 0, 0], spine2: [0.10, 0, 0],
+    neck: [0.12, 0, 0], head: [0.18, 0, 0],
+    lShoulder: [0, 0, 0], rShoulder: [0, 0, 0],
+    lArm: [0.12, 0.30, 1.60], rArm: [0.12, -0.30, -1.60],
+    lFore: [0.0, 0.70, 0.95], rFore: [0.0, -0.70, -0.95],
+    lHand: [-0.50, 0.10, 0.0], rHand: [-0.50, -0.10, 0.0],
+    fingerCurl: 0.5, fingerAxis: "x",
+  };
+  let bones = null, fingersL = [], fingersR = [], baseHandL = 0, baseHandR = 0, charReady = false;
+  const charMat = new THREE.MeshStandardMaterial({ color: 0x34373f, roughness: 0.45, metalness: 0.45 });
+  const pivot = new THREE.Group(); pivot.rotation.y = Math.PI; root.add(pivot); // face the monitor
+
+  function applyPose(model) {
+    const B = (n) => model.getObjectByName(n);
+    const setR = (n, r) => { const b = B(n); if (b && r) b.rotation.set(r[0], r[1], r[2]); };
+    pivot.position.set(POSE.pos[0], POSE.pos[1], POSE.pos[2]);
+    setR("mixamorigSpine", POSE.spine); setR("mixamorigSpine1", POSE.spine1); setR("mixamorigSpine2", POSE.spine2);
+    setR("mixamorigNeck", POSE.neck); setR("mixamorigHead", POSE.head);
+    setR("mixamorigLeftShoulder", POSE.lShoulder); setR("mixamorigRightShoulder", POSE.rShoulder);
+    setR("mixamorigLeftArm", POSE.lArm); setR("mixamorigRightArm", POSE.rArm);
+    setR("mixamorigLeftForeArm", POSE.lFore); setR("mixamorigRightForeArm", POSE.rFore);
+    setR("mixamorigLeftHand", POSE.lHand); setR("mixamorigRightHand", POSE.rHand);
+    baseHandL = POSE.lHand[0]; baseHandR = POSE.rHand[0];
+    bones = { spine2: B("mixamorigSpine2"), head: B("mixamorigHead"), neck: B("mixamorigNeck"),
+              lHand: B("mixamorigLeftHand"), rHand: B("mixamorigRightHand") };
+    fingersL = []; fingersR = [];
+    ["Thumb", "Index", "Middle", "Ring", "Pinky"].forEach((f) => {
+      [1, 2, 3].forEach((j) => {
+        const c = f === "Thumb" ? POSE.fingerCurl * 0.4 : POSE.fingerCurl;
+        const bl = B("mixamorigLeftHand" + f + j), br = B("mixamorigRightHand" + f + j);
+        if (bl) { bl.rotation[POSE.fingerAxis] = c; fingersL.push({ b: bl, base: c, ph: Math.random() * 6.28, sp: 9 + Math.random() * 6 }); }
+        if (br) { br.rotation[POSE.fingerAxis] = c; fingersR.push({ b: br, base: c, ph: Math.random() * 6.28, sp: 9 + Math.random() * 6 }); }
+      });
+    });
+  }
+
+  new THREE.GLTFLoader().load("xbot.glb", (gltf) => {
+    const model = window.__model = gltf.scene;
+    model.traverse((o) => { if (o.isMesh) { o.material = charMat; o.frustumCulled = false; } });
+    const box = new THREE.Box3().setFromObject(model);
+    const h = box.getSize(new THREE.Vector3()).y || 1;
+    model.scale.setScalar(POSE.scale / h);
+    pivot.add(model);
+    applyPose(model);
+    window.__applyPose = () => applyPose(model);
+    charReady = true;
+  });
+
+  scene.add(new THREE.AmbientLight(0x2a2b33, 0.7));
+  const screenLight = new THREE.PointLight(0xdfe6ff, 3.2, 18, 2); screenLight.position.set(0, 2.0, 0.1); scene.add(screenLight);
+  const rim = new THREE.DirectionalLight(0xaab4c8, 1.0); rim.position.set(6, 6, 7); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-5, 4, 5); scene.add(fill);
+  const backRim = new THREE.DirectionalLight(0x7d93ff, 1.1); backRim.position.set(-4, 6, -5); scene.add(backRim); // cool rim to separate the figure
 
   let mx = 0, my = 0;
   window.addEventListener("mousemove", (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; });
@@ -306,14 +352,17 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime; frame++;
     if (frame % 2 === 0) terminal.update(dt * 2);
-    const br = 1 + Math.sin(t * 1.6) * 0.012;
-    torso.scale.y = br; shoulders.position.y = 2.05 + Math.sin(t * 1.6) * 0.01;
-    armL.rotation.x = 0.98 + Math.sin(t * 7.0) * 0.07;
-    armR.rotation.x = 0.98 + Math.sin(t * 7.0 + 1.3) * 0.07;
-    head.position.y = 2.68 + Math.sin(t * 1.2) * 0.012;
-    person.rotation.y = Math.sin(t * 0.4) * 0.03;
+    if (charReady && bones) {
+      if (bones.spine2) bones.spine2.rotation.x = POSE.spine2[0] + Math.sin(t * 1.5) * 0.02;     // breathing
+      if (bones.head) bones.head.rotation.y = Math.sin(t * 0.5) * 0.06;                            // glance
+      if (bones.lHand) bones.lHand.rotation.x = baseHandL + Math.abs(Math.sin(t * 5.5)) * 0.10;    // wrist bob
+      if (bones.rHand) bones.rHand.rotation.x = baseHandR + Math.abs(Math.sin(t * 5.5 + 1.1)) * 0.10;
+      const ax = POSE.fingerAxis;
+      fingersL.forEach((f) => { f.b.rotation[ax] = f.base + Math.max(0, Math.sin(t * f.sp + f.ph)) * 0.28; });
+      fingersR.forEach((f) => { f.b.rotation[ax] = f.base + Math.max(0, Math.sin(t * f.sp + f.ph)) * 0.28; });
+    }
     root.position.y = Math.sin(t * 0.6) * 0.04;
-    screenLight.intensity = 2.8 + Math.sin(t * 9) * 0.07;
+    screenLight.intensity = 3.2 + Math.sin(t * 9) * 0.08;
     camera.position.x += (camBase.x + mx * 1.4 - camera.position.x) * 0.05;
     camera.position.y += (camBase.y - my * 0.9 - camera.position.y) * 0.05;
     camera.lookAt(root.position.x + lookTarget.x, lookTarget.y, lookTarget.z);
