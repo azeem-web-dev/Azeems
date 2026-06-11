@@ -33,31 +33,32 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // generic reveals — slow rise, reverses on scroll back
+  // text blocks & headings glide in from the side
   gsap.utils.toArray(".reveal").forEach((el) => {
-    gsap.fromTo(el, { y: 44, opacity: 0 }, {
-      y: 0, opacity: 1, duration: 1.15, ease: "power3.out",
+    if (el.closest(".proof-grid, .edu-grid")) return; // those cards are handled below
+    const dir = el.dataset.from === "right" ? 1 : -1;
+    gsap.fromTo(el, { x: dir * 60, opacity: 0 }, {
+      x: 0, opacity: 1, duration: 1.0, ease: "power3.out",
       scrollTrigger: { trigger: el, start: "top 88%", toggleActions: "play none none reverse" },
     });
   });
 
-  // assemble — cards collapse into one stacked point, then split to place on scroll
-  function assemble(groupSel) {
+  // grid cards slide in from alternating sides, staggered
+  function slideCards(groupSel, childSel) {
     const group = document.querySelector(groupSel);
     if (!group) return;
-    const items = gsap.utils.toArray(groupSel + " > .assemble");
-    items.forEach((item, i) => {
-      const dx = () => { const g = group.getBoundingClientRect(), r = item.getBoundingClientRect(); return (g.left + g.width / 2) - (r.left + r.width / 2); };
-      const dy = () => { const g = group.getBoundingClientRect(), r = item.getBoundingClientRect(); return (g.top + g.height / 2) - (r.top + r.height / 2); };
-      gsap.fromTo(item,
-        { x: dx, y: dy, scale: 0.5, rotation: (i - (items.length - 1) / 2) * 8, opacity: 0, transformOrigin: "center center" },
-        { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1, ease: "power2.out",
-          scrollTrigger: { trigger: group, start: "top 85%", end: "top 38%", scrub: 0.8 } });
+    gsap.utils.toArray(groupSel + " " + childSel).forEach((item, i) => {
+      gsap.fromTo(item, { x: (i % 2 ? 1 : -1) * 110, opacity: 0 }, {
+        x: 0, opacity: 1, duration: 1.0, ease: "power3.out", delay: (i % 3) * 0.08,
+        scrollTrigger: { trigger: group, start: "top 82%", toggleActions: "play none none reverse" },
+      });
     });
   }
-  assemble(".projects");
-  assemble(".skills");
-  assemble(".process-grid");
+  slideCards(".projects", "> .assemble");
+  slideCards(".skills", "> .assemble");
+  slideCards(".process-grid", "> .assemble");
+  slideCards(".proof-grid", "> .proof-card");
+  slideCards(".edu-grid", "> .edu-card");
 
   window.addEventListener("load", () => ScrollTrigger.refresh());
 })();
