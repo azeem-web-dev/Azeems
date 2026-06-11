@@ -165,6 +165,25 @@ em { font-style: normal; }
 .stat-unit { color: var(--ink-soft); font-size: 26px; }
 .stat p { font-size: 12px; letter-spacing: 1.3px; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
 
+/* ---------- Experience journey map ---------- */
+.journey { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); row-gap: 90px; }
+.journey-svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: visible; }
+.j-track, .j-liquid { fill: none; stroke-linecap: round; }
+.j-track  { stroke: rgba(14,14,16,0.13); stroke-width: 0.28; }
+.j-liquid { stroke: var(--ink); stroke-width: 0.5; filter: drop-shadow(0 0 5px rgba(14,14,16,0.35)); }
+.j-node {
+  position: absolute; z-index: 2; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--bg-2); border: 2px solid var(--ink); transform: translate(-50%, -50%);
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+.j-node.lit { background: var(--ink); box-shadow: 0 0 0 6px rgba(14,14,16,0.10), 0 0 20px rgba(14,14,16,0.45); }
+.j-card { position: relative; z-index: 1; padding: 28px 30px; transition: border-color 0.35s ease, box-shadow 0.45s ease, transform 0.4s ease; }
+.j-card:hover { transform: perspective(800px) translateY(-6px) rotateX(3deg); }
+.jc-1 { grid-column: 1 / 7;  grid-row: 1; }
+.jc-2 { grid-column: 4 / 10; grid-row: 2; }
+.jc-3 { grid-column: 7 / 13; grid-row: 3; }
+.j-card.lit { border-color: var(--ink); box-shadow: 0 18px 48px rgba(14,14,16,0.15); }
+
 /* ---------- Timeline ---------- */
 .timeline { position: relative; padding-left: 42px; }
 .timeline::before { content: ""; position: absolute; left: 8px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--ink), transparent); }
@@ -317,6 +336,9 @@ em { font-style: normal; }
   .hero-inner { padding: 0 28px; }
   .hero-overlay { background: linear-gradient(0deg, rgba(11,11,13,0.92) 0%, rgba(11,11,13,0.45) 55%, rgba(11,11,13,0.3) 100%); }
   .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  .journey { display: block; }
+  .journey-svg, .j-node { display: none; }
+  .j-card { margin-bottom: 26px; }
   .projects { grid-template-columns: 1fr; }
   .skills { grid-template-columns: 1fr 1fr; }
   .process-grid { grid-template-columns: 1fr 1fr; }

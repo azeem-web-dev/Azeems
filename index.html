@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="portfolio.css?v=7" />
+  <link rel="stylesheet" href="portfolio.css?v=8" />
 </head>
 <body>
 
@@ -81,9 +81,15 @@
       <div class="container">
         <p class="kicker reveal">02 — Experience</p>
         <h2 class="title reveal">Where I've <em>worked</em></h2>
-        <div class="timeline">
-          <article class="t-item reveal">
-            <div class="t-dot"></div>
+        <div class="journey">
+          <svg class="journey-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <path class="j-track"  d="M 50 12 C 95 20, 60 35, 24 50 C 4 60, 14 84, 50 88" />
+            <path class="j-liquid" id="j-liquid" d="M 50 12 C 95 20, 60 35, 24 50 C 4 60, 14 84, 50 88" />
+          </svg>
+          <span class="j-node jn-1" style="left:50%; top:12%" aria-hidden="true"></span>
+          <span class="j-node jn-2" style="left:24%; top:50%" aria-hidden="true"></span>
+          <span class="j-node jn-3" style="left:50%; top:88%" aria-hidden="true"></span>
+          <article class="j-card jc-1 glass reveal">
             <p class="t-date">2023 — Present</p>
             <h3 class="t-role">Co-Founder, CEO &amp; Lead Developer</h3>
             <p class="t-org">HMGenX</p>
@@ -91,8 +97,7 @@
             AI software &amp; automation for clients — owning everything from requirements to
             deployment. Shipped multiple paid projects generating ₹60,000+ in revenue.</p>
           </article>
-          <article class="t-item reveal">
-            <div class="t-dot"></div>
+          <article class="j-card jc-2 glass reveal" data-from="right">
             <p class="t-date">Jul — Sep 2025</p>
             <h3 class="t-role">Front-end Development Intern</h3>
             <p class="t-org">InLighnX Global Pvt. Ltd.</p>
@@ -100,8 +105,7 @@
             translation, voice input, TTS and local history — JavaScript (Web Speech API), GSAP,
             LocalStorage.</p>
           </article>
-          <article class="t-item reveal">
-            <div class="t-dot"></div>
+          <article class="j-card jc-3 glass reveal">
             <p class="t-date">Apr — Jul 2025</p>
             <h3 class="t-role">Web Development Intern</h3>
             <p class="t-org">Konic Technologies</p>
@@ -321,6 +325,6 @@
   <script src="three.min.js"></script>
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
-  <script src="portfolio.js?v=7"></script>
+  <script src="portfolio.js?v=8"></script>
 </body>
 </html>

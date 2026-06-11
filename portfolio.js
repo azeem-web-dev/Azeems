@@ -273,3 +273,53 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     }
   })(t0);
 })();
+
+/* ===========================================================
+   Experience — journey map liquid
+   Black liquid flows along the snake path as you scroll,
+   reaching each station and lighting it up one by one.
+   =========================================================== */
+(function journeyLiquid() {
+  const path = document.getElementById("j-liquid");
+  const journey = document.querySelector(".journey");
+  if (!path || !journey) return;
+
+  const len = path.getTotalLength();
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+
+  // find how far along the path each station sits (sample & match nearest point)
+  const stations = [[50, 12], [24, 50], [50, 88]];
+  const fractions = stations.map(([sx, sy]) => {
+    let best = 0, bestD = Infinity;
+    for (let i = 0; i <= 300; i++) {
+      const pt = path.getPointAtLength((i / 300) * len);
+      const d = (pt.x - sx) ** 2 + (pt.y - sy) ** 2;
+      if (d < bestD) { bestD = d; best = i / 300; }
+    }
+    return best;
+  });
+
+  const nodes = [".jn-1", ".jn-2", ".jn-3"].map((s) => document.querySelector(s));
+  const cards = [".jc-1", ".jc-2", ".jc-3"].map((s) => document.querySelector(s));
+
+  function setProgress(p) {
+    path.style.strokeDashoffset = len * (1 - p);
+    fractions.forEach((f, i) => {
+      const on = p >= Math.max(f, 0.02);
+      if (nodes[i]) nodes[i].classList.toggle("lit", on);
+      if (cards[i]) cards[i].classList.toggle("lit", on);
+    });
+  }
+
+  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+    const state = { p: 0 };
+    gsap.to(state, {
+      p: 1, ease: "none",
+      scrollTrigger: { trigger: journey, start: "top 80%", end: "bottom 55%", scrub: 0.6 },
+      onUpdate: () => setProgress(state.p),
+    });
+  } else {
+    setProgress(1); // no GSAP — show the journey complete
+  }
+})();
