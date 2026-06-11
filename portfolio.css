@@ -42,24 +42,14 @@ em { font-style: normal; }
 .assemble { height: 100%; }
 .assemble > * { height: 100%; }
 
-/* ---------- Glass + gradient border ---------- */
+/* ---------- Glass (plain, borderless) ---------- */
 .glass {
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(14, 14, 16, 0.10);
   border-radius: 18px;
   box-shadow: 0 14px 40px rgba(14, 14, 16, 0.08), 0 2px 6px rgba(14, 14, 16, 0.04);
 }
-.grad-border { position: relative; isolation: isolate; }
-.grad-border::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-  background: linear-gradient(135deg, var(--ink), transparent 42%, transparent 58%, var(--ink-soft));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  opacity: 0.35; transition: opacity 0.45s ease; pointer-events: none;
-}
-.grad-border:hover::after { opacity: 1; }
 
 /* ===========================================================
    NAV
@@ -116,7 +106,7 @@ em { font-style: normal; }
 .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
 .btn { font-size: 12.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; padding: 15px 34px; border-radius: 10px; transition: all 0.35s ease; position: relative; overflow: hidden; }
 .btn-solid { background: #fff; color: var(--ink); }
-.btn-solid:hover { transform: translateY(-3px); box-shadow: 0 16px 38px rgba(255,255,255,0.18); }
+.btn-solid:hover { transform: translateY(-3px); }
 .btn-solid::before { content:""; position:absolute; top:0; left:-120%; width:60%; height:100%; background: linear-gradient(100deg, transparent, rgba(14,14,16,0.12), transparent); transform: skewX(-20deg); transition: left 0.7s ease; }
 .btn-solid:hover::before { left: 140%; }
 .btn-ghost { border: 1px solid rgba(255,255,255,0.32); color: #fff; }
@@ -143,11 +133,8 @@ em { font-style: normal; }
 }
 
 /* ---------- About background art ---------- */
-#about {
-  background-image: radial-gradient(rgba(14,14,16,0.08) 1.2px, transparent 1.2px);
-  background-size: 26px 26px;
-}
 .about-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.about-dots { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .ghost-word {
   position: absolute; right: -2%; bottom: -4%; line-height: 0.8;
   font-family: var(--disp); font-weight: 700; font-size: clamp(120px, 22vw, 300px);
@@ -155,27 +142,7 @@ em { font-style: normal; }
   -webkit-text-stroke: 1.5px rgba(14,14,16,0.07);
   user-select: none;
 }
-.float-tag {
-  position: absolute; font-family: var(--mono); font-size: 13px; letter-spacing: 0.5px;
-  color: rgba(14,14,16,0.38);
-  background: rgba(255,255,255,0.55); border: 1px solid rgba(14,14,16,0.10);
-  border-radius: 999px; padding: 8px 16px;
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(14,14,16,0.05);
-  animation: floaty 7s ease-in-out infinite;
-  user-select: none; white-space: nowrap;
-}
-.ft-1 { top: 16%; right: 6%; animation-delay: 0s; }
-.ft-2 { bottom: 7%; right: 26%; animation-delay: -2.3s; }
-.ft-3 { bottom: 9%; right: 3%; animation-delay: -4.1s; }
-.ft-4 { top: 9%; left: 44%; font-size: 20px; padding: 10px 16px; animation-delay: -1.2s; }
-.ft-5 { bottom: 14%; left: 36%; animation-delay: -5.4s; }
-@keyframes floaty {
-  0%, 100% { transform: translateY(0) rotate(-1deg); }
-  50% { transform: translateY(-14px) rotate(1.4deg); }
-}
 @media (max-width: 980px) {
-  .ft-1, .ft-2, .ft-3, .ft-4, .ft-5 { display: none; }
   .ghost-word { font-size: 130px; right: -8%; }
 }
 .container { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 40px; }

@@ -223,3 +223,53 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     renderer.render(scene, camera);
   })();
 })();
+
+/* ===========================================================
+   About — flowing dot grid
+   Dots drift left → right while a wave travels through the grid,
+   so neighbouring dots swap positions on the cross axis one by one.
+   =========================================================== */
+(function aboutDots() {
+  const canvas = document.getElementById("about-dots");
+  const section = document.getElementById("about");
+  if (!canvas || !section) return;
+  const ctx = canvas.getContext("2d");
+
+  const GAP = 26, R = 1.3, DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, cols = 0, rows = 0;
+
+  function resize() {
+    W = section.offsetWidth; H = section.offsetHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    cols = Math.ceil(W / GAP) + 2;
+    rows = Math.ceil(H / GAP) + 2;
+  }
+  window.addEventListener("resize", resize); resize();
+
+  let visible = true;
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(section);
+
+  const t0 = performance.now();
+  (function draw(now) {
+    requestAnimationFrame(draw);
+    if (!visible) return;
+    const t = (now - t0) / 1000;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = "rgba(14,14,16,0.14)";
+    const drift = (t * 9) % GAP;                       // slow left → right drift
+    for (let c = 0; c < cols; c++) {
+      const x = c * GAP - GAP + drift;
+      // wave travels rightwards: each column is one step behind its neighbour,
+      // so dots shift up/down one after another, swapping rows in the cross axis
+      const phase = t * 1.6 - c * 0.55;
+      const dy = Math.sin(phase) * GAP * 0.5;
+      for (let r = 0; r < rows; r++) {
+        const y = r * GAP - GAP + (r % 2 ? dy : -dy);  // odd/even rows swap toward each other
+        ctx.beginPath();
+        ctx.arc(x, y, R, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  })(t0);
+})();
