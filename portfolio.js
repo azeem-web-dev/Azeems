@@ -161,7 +161,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 })();
 
 /* ===========================================================
-   3D hero — interactive neural-network particle field
+   3D hero — morphing liquid-glass blob (GPU noise + reflections)
    =========================================================== */
 (function heroScene() {
   if (typeof THREE === "undefined") return;
@@ -171,74 +171,93 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x0b0b0d, 1);
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-  camera.position.z = 15;
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 7.6);
 
-  // soft round sprite for particles
-  const sc = document.createElement("canvas"); sc.width = sc.height = 64;
-  const sx = sc.getContext("2d");
-  const g = sx.createRadialGradient(32, 32, 0, 32, 32, 32);
-  g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.4, "rgba(255,255,255,0.6)"); g.addColorStop(1, "rgba(255,255,255,0)");
-  sx.fillStyle = g; sx.fillRect(0, 0, 64, 64);
-  const sprite = new THREE.CanvasTexture(sc);
+  /* ---- iridescent environment (drives the glass reflections) ---- */
+  const ec = document.createElement("canvas"); ec.width = 1024; ec.height = 512;
+  const ex = ec.getContext("2d");
+  const vg = ex.createLinearGradient(0, 0, 0, 512);
+  vg.addColorStop(0, "#070710"); vg.addColorStop(0.42, "#33408a"); vg.addColorStop(0.5, "#e6ecff");
+  vg.addColorStop(0.58, "#8a5cff"); vg.addColorStop(1, "#070710");
+  ex.fillStyle = vg; ex.fillRect(0, 0, 1024, 512);
+  ex.globalCompositeOperation = "lighter";
+  const glow = (x, y, r, c) => { const g = ex.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, c); g.addColorStop(1, "rgba(0,0,0,0)"); ex.fillStyle = g; ex.fillRect(0, 0, 1024, 512); };
+  glow(300, 150, 280, "rgba(120,165,255,0.95)");
+  glow(770, 360, 260, "rgba(255,120,205,0.8)");
+  glow(540, 80, 200, "rgba(120,255,235,0.6)");
+  const envTex = new THREE.CanvasTexture(ec); envTex.mapping = THREE.EquirectangularReflectionMapping; envTex.encoding = THREE.sRGBEncoding;
 
-  const N = 200, R = 7, group = new THREE.Group(); scene.add(group);
-  const pos = new Float32Array(N * 3), vel = [];
-  for (let i = 0; i < N; i++) {
-    const theta = Math.random() * Math.PI * 2, phi = Math.acos(2 * Math.random() - 1), rr = R * (0.45 + Math.random() * 0.55);
-    pos[i * 3] = rr * Math.sin(phi) * Math.cos(theta);
-    pos[i * 3 + 1] = rr * Math.sin(phi) * Math.sin(theta) * 0.8;
-    pos[i * 3 + 2] = rr * Math.cos(phi);
-    vel.push([(Math.random() - 0.5) * 0.012, (Math.random() - 0.5) * 0.012, (Math.random() - 0.5) * 0.012]);
-  }
-  const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const points = new THREE.Points(pGeo, new THREE.PointsMaterial({ map: sprite, color: 0xffffff, size: 0.34, transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending }));
-  group.add(points);
+  scene.add(new THREE.AmbientLight(0x404860, 0.55));
+  const d1 = new THREE.DirectionalLight(0xffffff, 1.0); d1.position.set(5, 6, 5); scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0x6a7bff, 0.9); d2.position.set(-6, -2, 3); scene.add(d2);
 
-  const maxLines = N * 8, linePos = new Float32Array(maxLines * 3);
-  const lineGeo = new THREE.BufferGeometry();
-  lineGeo.setAttribute("position", new THREE.BufferAttribute(linePos, 3));
-  const lines = new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0xaab2c8, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending }));
-  group.add(lines);
+  const SNOISE = `
+  vec3 sn_mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+  vec4 sn_mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+  vec4 sn_permute(vec4 x){return sn_mod289(((x*34.0)+1.0)*x);}
+  vec4 sn_tisqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+  float snoise(vec3 v){
+    const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+    vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+    vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+    vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy; i=sn_mod289(i);
+    vec4 p=sn_permute(sn_permute(sn_permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+    float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+    vec4 j=p-49.0*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+    vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
+    vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+    vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
+    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+    vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+    vec4 norm=sn_tisqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3))); p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
+    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
+    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+  }`;
 
-  let mx = 0, my = 0;
-  window.addEventListener("mousemove", (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; });
+  const uniforms = { uTime: { value: 0 }, uAmp: { value: 0.5 }, uFreq: { value: 0.52 }, uMouse: { value: new THREE.Vector2(0, 0) } };
+  const mat = new THREE.MeshPhysicalMaterial({ color: 0x222a55, metalness: 0.35, roughness: 0.12, clearcoat: 1.0, clearcoatRoughness: 0.14, envMap: envTex, envMapIntensity: 1.5, reflectivity: 1.0 });
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.uTime = uniforms.uTime; shader.uniforms.uAmp = uniforms.uAmp;
+    shader.uniforms.uFreq = uniforms.uFreq; shader.uniforms.uMouse = uniforms.uMouse;
+    shader.vertexShader = "uniform float uTime; uniform float uAmp; uniform float uFreq; uniform vec2 uMouse;\n" + SNOISE +
+      "\nvec3 sn_disp(vec3 p){ float n = snoise(p*uFreq + vec3(uMouse*1.4, uTime*0.28)); float n2 = snoise(p*uFreq*2.1 + vec3(0.0, uTime*0.18, 0.0)); return p + normalize(p)*((n*0.8 + n2*0.3)*uAmp); }\n" +
+      shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace("#include <beginnormal_vertex>",
+      "vec3 sn_p0 = sn_disp(position); vec3 sn_N = normalize(position);" +
+      "vec3 sn_t = normalize(cross(sn_N, vec3(0.0,1.0,0.0)) + vec3(0.0001));" +
+      "vec3 sn_b = normalize(cross(sn_N, sn_t)); float sn_e = 0.06;" +
+      "vec3 sn_pa = sn_disp(position + sn_t*sn_e); vec3 sn_pb = sn_disp(position + sn_b*sn_e);" +
+      "vec3 objectNormal = normalize(cross(sn_pa - sn_p0, sn_pb - sn_p0));");
+    shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "vec3 transformed = sn_disp(position);");
+  };
+
+  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(2.4, 12), mat);
+  const group = new THREE.Group(); group.add(blob); scene.add(group);
+
+  let mx = 0, my = 0, tmx = 0, tmy = 0;
+  window.addEventListener("mousemove", (e) => { tmx = e.clientX / window.innerWidth - 0.5; tmy = e.clientY / window.innerHeight - 0.5; });
   function resize() {
     const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    group.position.x = w > 980 ? 4.0 : 0;   // sit to the right, clear of the hero text
+    group.position.x = w > 980 ? 2.7 : 0;   // sit to the right, clear of the hero text
   }
   window.addEventListener("resize", resize); resize();
 
-  const clock = new THREE.Clock(), R2 = R * R, maxD2 = 2.3 * 2.3;
+  const clock = new THREE.Clock();
   (function animate() {
     requestAnimationFrame(animate);
     const t = clock.elapsedTime;
-    for (let i = 0; i < N; i++) {
-      const k = i * 3; pos[k] += vel[i][0]; pos[k + 1] += vel[i][1]; pos[k + 2] += vel[i][2];
-      const r2 = pos[k] * pos[k] + pos[k + 1] * pos[k + 1] + pos[k + 2] * pos[k + 2];
-      if (r2 > R2) { const inv = 1 / Math.sqrt(r2), nx = pos[k] * inv, ny = pos[k + 1] * inv, nz = pos[k + 2] * inv;
-        const dot = vel[i][0] * nx + vel[i][1] * ny + vel[i][2] * nz;
-        vel[i][0] -= 2 * dot * nx; vel[i][1] -= 2 * dot * ny; vel[i][2] -= 2 * dot * nz; }
-    }
-    pGeo.attributes.position.needsUpdate = true;
-    let li = 0;
-    for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
-      const a = i * 3, b = j * 3, dx = pos[a] - pos[b], dy = pos[a + 1] - pos[b + 1], dz = pos[a + 2] - pos[b + 2];
-      if (dx * dx + dy * dy + dz * dz < maxD2 && li < maxLines - 2) {
-        linePos[li * 3] = pos[a]; linePos[li * 3 + 1] = pos[a + 1]; linePos[li * 3 + 2] = pos[a + 2]; li++;
-        linePos[li * 3] = pos[b]; linePos[li * 3 + 1] = pos[b + 1]; linePos[li * 3 + 2] = pos[b + 2]; li++;
-      }
-    }
-    lineGeo.setDrawRange(0, li); lineGeo.attributes.position.needsUpdate = true;
-    group.rotation.y = t * 0.06 + mx * 0.6;
-    group.rotation.x = my * 0.4;
-    camera.position.x += (mx * 2.5 - camera.position.x) * 0.04;
-    camera.position.y += (-my * 1.8 - camera.position.y) * 0.04;
-    camera.lookAt(group.position.x * 0.5, 0, 0);
+    mx += (tmx - mx) * 0.05; my += (tmy - my) * 0.05;
+    uniforms.uTime.value = t;
+    uniforms.uMouse.value.set(mx * 2.0, my * 2.0);
+    uniforms.uAmp.value = 0.5 + Math.hypot(mx, my) * 0.4;   // warps more as the cursor moves
+    group.rotation.y = t * 0.12 + mx * 0.8;
+    group.rotation.x = -my * 0.5;
+    camera.lookAt(group.position.x * 0.55, 0, 0);
     renderer.render(scene, camera);
   })();
 })();
