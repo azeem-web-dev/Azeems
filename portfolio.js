@@ -161,7 +161,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 })();
 
 /* ===========================================================
-   3D hero — morphing liquid-glass blob (GPU noise + reflections)
+   3D hero — flowing wave field (grid of glowing points + wireframe)
    =========================================================== */
 (function heroScene() {
   if (typeof THREE === "undefined") return;
@@ -171,93 +171,54 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setClearColor(0x0b0b0d, 1);
-  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.set(0, 0, 7.6);
+  scene.fog = new THREE.FogExp2(0x0b0b0d, 0.058);
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+  camera.position.set(0, 3.2, 9);
 
-  /* ---- iridescent environment (drives the glass reflections) ---- */
-  const ec = document.createElement("canvas"); ec.width = 1024; ec.height = 512;
-  const ex = ec.getContext("2d");
-  const vg = ex.createLinearGradient(0, 0, 0, 512);
-  vg.addColorStop(0, "#070710"); vg.addColorStop(0.42, "#33408a"); vg.addColorStop(0.5, "#e6ecff");
-  vg.addColorStop(0.58, "#8a5cff"); vg.addColorStop(1, "#070710");
-  ex.fillStyle = vg; ex.fillRect(0, 0, 1024, 512);
-  ex.globalCompositeOperation = "lighter";
-  const glow = (x, y, r, c) => { const g = ex.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, c); g.addColorStop(1, "rgba(0,0,0,0)"); ex.fillStyle = g; ex.fillRect(0, 0, 1024, 512); };
-  glow(300, 150, 280, "rgba(120,165,255,0.95)");
-  glow(770, 360, 260, "rgba(255,120,205,0.8)");
-  glow(540, 80, 200, "rgba(120,255,235,0.6)");
-  const envTex = new THREE.CanvasTexture(ec); envTex.mapping = THREE.EquirectangularReflectionMapping; envTex.encoding = THREE.sRGBEncoding;
+  // soft round sprite for the points
+  const dc = document.createElement("canvas"); dc.width = dc.height = 64;
+  const dx = dc.getContext("2d");
+  const dg = dx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  dg.addColorStop(0, "rgba(255,255,255,1)"); dg.addColorStop(0.45, "rgba(230,236,255,0.5)"); dg.addColorStop(1, "rgba(255,255,255,0)");
+  dx.fillStyle = dg; dx.fillRect(0, 0, 64, 64);
+  const sprite = new THREE.CanvasTexture(dc);
 
-  scene.add(new THREE.AmbientLight(0x404860, 0.55));
-  const d1 = new THREE.DirectionalLight(0xffffff, 1.0); d1.position.set(5, 6, 5); scene.add(d1);
-  const d2 = new THREE.DirectionalLight(0x6a7bff, 0.9); d2.position.set(-6, -2, 3); scene.add(d2);
+  const W = 46, D = 34, SX = 92, SZ = 68;
+  const geo = new THREE.PlaneGeometry(W, D, SX, SZ); geo.rotateX(-Math.PI / 2);
+  const base = geo.attributes.position.array.slice(); // store flat x/z
+  const grid = new THREE.Group(); scene.add(grid);
 
-  const SNOISE = `
-  vec3 sn_mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 sn_mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
-  vec4 sn_permute(vec4 x){return sn_mod289(((x*34.0)+1.0)*x);}
-  vec4 sn_tisqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
-    vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g; vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
-    vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy; i=sn_mod289(i);
-    vec4 p=sn_permute(sn_permute(sn_permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
-    float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
-    vec4 j=p-49.0*floor(p*ns.z*ns.z); vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
-    vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy; vec4 h=1.0-abs(x)-abs(y);
-    vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
-    vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0; vec4 sh=-step(h,vec4(0.0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
-    vec4 norm=sn_tisqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3))); p0*=norm.x;p1*=norm.y;p2*=norm.z;p3*=norm.w;
-    vec4 m=max(0.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0); m=m*m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-  }`;
-
-  const uniforms = { uTime: { value: 0 }, uAmp: { value: 0.5 }, uFreq: { value: 0.52 }, uMouse: { value: new THREE.Vector2(0, 0) } };
-  const mat = new THREE.MeshPhysicalMaterial({ color: 0x222a55, metalness: 0.35, roughness: 0.12, clearcoat: 1.0, clearcoatRoughness: 0.14, envMap: envTex, envMapIntensity: 1.5, reflectivity: 1.0 });
-  mat.onBeforeCompile = (shader) => {
-    shader.uniforms.uTime = uniforms.uTime; shader.uniforms.uAmp = uniforms.uAmp;
-    shader.uniforms.uFreq = uniforms.uFreq; shader.uniforms.uMouse = uniforms.uMouse;
-    shader.vertexShader = "uniform float uTime; uniform float uAmp; uniform float uFreq; uniform vec2 uMouse;\n" + SNOISE +
-      "\nvec3 sn_disp(vec3 p){ float n = snoise(p*uFreq + vec3(uMouse*1.4, uTime*0.28)); float n2 = snoise(p*uFreq*2.1 + vec3(0.0, uTime*0.18, 0.0)); return p + normalize(p)*((n*0.8 + n2*0.3)*uAmp); }\n" +
-      shader.vertexShader;
-    shader.vertexShader = shader.vertexShader.replace("#include <beginnormal_vertex>",
-      "vec3 sn_p0 = sn_disp(position); vec3 sn_N = normalize(position);" +
-      "vec3 sn_t = normalize(cross(sn_N, vec3(0.0,1.0,0.0)) + vec3(0.0001));" +
-      "vec3 sn_b = normalize(cross(sn_N, sn_t)); float sn_e = 0.06;" +
-      "vec3 sn_pa = sn_disp(position + sn_t*sn_e); vec3 sn_pb = sn_disp(position + sn_b*sn_e);" +
-      "vec3 objectNormal = normalize(cross(sn_pa - sn_p0, sn_pb - sn_p0));");
-    shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "vec3 transformed = sn_disp(position);");
-  };
-
-  const blob = new THREE.Mesh(new THREE.IcosahedronGeometry(2.4, 12), mat);
-  const group = new THREE.Group(); group.add(blob); scene.add(group);
+  const wire = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0x6f7790, wireframe: true, transparent: true, opacity: 0.10, blending: THREE.AdditiveBlending }));
+  const pts = new THREE.Points(geo, new THREE.PointsMaterial({ map: sprite, color: 0xffffff, size: 0.16, transparent: true, opacity: 0.95, sizeAttenuation: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  grid.add(wire); grid.add(pts);
 
   let mx = 0, my = 0, tmx = 0, tmy = 0;
   window.addEventListener("mousemove", (e) => { tmx = e.clientX / window.innerWidth - 0.5; tmy = e.clientY / window.innerHeight - 0.5; });
   function resize() {
     const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    group.position.x = w > 980 ? 2.7 : 0;   // sit to the right, clear of the hero text
   }
   window.addEventListener("resize", resize); resize();
 
   const clock = new THREE.Clock();
+  const arr = geo.attributes.position.array;
   (function animate() {
     requestAnimationFrame(animate);
     const t = clock.elapsedTime;
     mx += (tmx - mx) * 0.05; my += (tmy - my) * 0.05;
-    uniforms.uTime.value = t;
-    uniforms.uMouse.value.set(mx * 2.0, my * 2.0);
-    uniforms.uAmp.value = 0.5 + Math.hypot(mx, my) * 0.4;   // warps more as the cursor moves
-    group.rotation.y = t * 0.12 + mx * 0.8;
-    group.rotation.x = -my * 0.5;
-    camera.lookAt(group.position.x * 0.55, 0, 0);
+    for (let i = 0; i < arr.length; i += 3) {
+      const x = base[i], z = base[i + 2];
+      arr[i + 1] = Math.sin(x * 0.42 + t * 0.9) * 0.62
+                 + Math.cos(z * 0.5 + t * 0.75) * 0.5
+                 + Math.sin((x + z) * 0.28 + t * 1.15) * 0.42;
+    }
+    geo.attributes.position.needsUpdate = true;
+    grid.rotation.y = mx * 0.25;
+    camera.position.x += (mx * 4 - camera.position.x) * 0.04;
+    camera.position.y += (3.2 - my * 1.6 - camera.position.y) * 0.04;
+    camera.lookAt(0, -0.4, -3);
     renderer.render(scene, camera);
   })();
 })();
