@@ -48,7 +48,7 @@ em { font-style: normal; }
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
   border-radius: 18px;
-  box-shadow: 0 14px 40px rgba(14, 14, 16, 0.08), 0 2px 6px rgba(14, 14, 16, 0.04);
+  box-shadow: 0 18px 44px rgba(14, 14, 16, 0.07);
 }
 
 /* ===========================================================
