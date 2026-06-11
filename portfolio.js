@@ -207,17 +207,18 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   (function animate() {
     requestAnimationFrame(animate);
     const t = clock.elapsedTime;
-    mx += (tmx - mx) * 0.05; my += (tmy - my) * 0.05;
+    mx += (tmx - mx) * 0.09; my += (tmy - my) * 0.09;
     for (let i = 0; i < arr.length; i += 3) {
       const x = base[i], z = base[i + 2];
-      arr[i + 1] = Math.sin(x * 0.42 + t * 0.9) * 0.62
-                 + Math.cos(z * 0.5 + t * 0.75) * 0.5
-                 + Math.sin((x + z) * 0.28 + t * 1.15) * 0.42;
+      // gentle, continuous up/down — like the surface of still water
+      arr[i + 1] = Math.sin(x * 0.42 + t * 0.4) * 0.62
+                 + Math.cos(z * 0.5 + t * 0.34) * 0.5
+                 + Math.sin((x + z) * 0.28 + t * 0.5) * 0.42;
     }
     geo.attributes.position.needsUpdate = true;
-    grid.rotation.y = mx * 0.25;
-    camera.position.x += (mx * 4 - camera.position.x) * 0.04;
-    camera.position.y += (3.2 - my * 1.6 - camera.position.y) * 0.04;
+    grid.rotation.y = mx * 0.6;
+    camera.position.x += (mx * 8 - camera.position.x) * 0.05;
+    camera.position.y += (3.2 - my * 3.4 - camera.position.y) * 0.05;
     camera.lookAt(0, -0.4, -3);
     renderer.render(scene, camera);
   })();
