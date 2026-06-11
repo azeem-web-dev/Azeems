@@ -17,9 +17,9 @@
     <a class="nav-brand" href="#home">R<span class="gold">A</span>S</a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Work</a></li>
+      <li><a href="#process">Process</a></li>
+      <li><a href="#proof">Proof</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <a class="nav-resume" href="Rayyan_Azeem_Syed_Resume.pdf" target="_blank" rel="noopener">Résumé</a>
@@ -112,47 +112,42 @@
     <section class="section" id="projects">
       <div class="container">
         <p class="kicker reveal">03 — Selected Work</p>
-        <h2 class="title reveal">Products with <em>proof</em></h2>
+        <h2 class="title reveal">Products with <em>proof</em> <span class="title-hint">— click any card</span></h2>
 
         <div class="projects">
-          <article class="card glass grad-border reveal" data-tilt>
-            <div class="card-top">
-              <span class="card-no">I</span>
-              <span class="card-badge">Deployed · ₹40,000</span>
-            </div>
-            <h3 class="card-name">OMR Scanner &amp; Mark Report System</h3>
-            <p class="card-desc">Real-time scanner for JEE &amp; EAMCET OMR sheets — OpenCV bubble
-            detection grading at <strong>98.6% accuracy, 2–3 papers per second</strong>, generating
-            detailed mark reports. Sold to two institutions; recognised with a Certificate of
-            Appreciation from Nakshatra IIT-JEE Academy.</p>
-            <p class="card-stack">Python · OpenCV · MySQL · Desktop &amp; Mobile</p>
-          </article>
-
-          <article class="card glass grad-border reveal" data-tilt>
-            <div class="card-top">
-              <span class="card-no">II</span>
-              <span class="card-badge">Client · ₹20,000</span>
-            </div>
-            <h3 class="card-name">Plot Map Detection System</h3>
-            <p class="card-desc">For Sri Bramharamba Real Estate, Guntur — a GPU-accelerated YOLO
-            engine that reads a plot map and returns the coordinates and number of every plot at
-            <strong>99.2% accuracy, ~5,000 plots in 3 seconds</strong>. Shipped as a PyQt6 desktop
-            application.</p>
-            <p class="card-stack">Python · YOLO · CUDA · OpenCV · PyQt6</p>
-          </article>
-
-          <article class="card glass grad-border reveal" data-tilt>
-            <div class="card-top">
-              <span class="card-no">III</span>
-              <span class="card-badge">SIH 2025</span>
-            </div>
-            <h3 class="card-name">Lipi — Bharat Script Transliteration</h3>
-            <p class="card-desc">A Flutter app that transliterates &amp; translates across Indian
-            scripts and English — camera OCR for signboards, offline on-device models, real-time
-            typing and auto script-detection. Built as a solution for Smart India Hackathon 2025
-            (PS #25155).</p>
-            <p class="card-stack">Flutter · ML Kit · Tesseract / OpenCV · REST API</p>
-          </article>
+          <div class="assemble">
+            <article class="card glass grad-border" data-project="omr" role="button" tabindex="0">
+              <div class="card-top"><span class="card-no">I</span><span class="card-badge">Deployed · ₹40,000</span></div>
+              <h3 class="card-name">OMR Scanner &amp; Mark Report System</h3>
+              <p class="card-desc">Real-time scanner for JEE &amp; EAMCET OMR sheets — OpenCV bubble
+              detection grading at <strong>98.6% accuracy, 2–3 papers/second</strong>, generating
+              detailed mark reports. Sold to two institutions.</p>
+              <p class="card-stack">Python · OpenCV · MySQL · Desktop &amp; Mobile</p>
+              <span class="card-open">View case study →</span>
+            </article>
+          </div>
+          <div class="assemble">
+            <article class="card glass grad-border" data-project="plot" role="button" tabindex="0">
+              <div class="card-top"><span class="card-no">II</span><span class="card-badge">Client · ₹20,000</span></div>
+              <h3 class="card-name">Plot Map Detection System</h3>
+              <p class="card-desc">For Sri Bramharamba Real Estate — a GPU-accelerated YOLO engine that
+              reads a plot map and returns the coordinates &amp; number of every plot at
+              <strong>99.2% accuracy, ~5,000 plots in 3s</strong>.</p>
+              <p class="card-stack">Python · YOLO · CUDA · OpenCV · PyQt6</p>
+              <span class="card-open">View case study →</span>
+            </article>
+          </div>
+          <div class="assemble">
+            <article class="card glass grad-border" data-project="lipi" role="button" tabindex="0">
+              <div class="card-top"><span class="card-no">III</span><span class="card-badge">SIH 2025</span></div>
+              <h3 class="card-name">Lipi — Bharat Script Transliteration</h3>
+              <p class="card-desc">A Flutter app that transliterates &amp; translates across Indian
+              scripts and English — camera OCR for signboards, offline on-device models, real-time
+              typing &amp; auto script-detection.</p>
+              <p class="card-stack">Flutter · ML Kit · Tesseract / OpenCV · REST API</p>
+              <span class="card-open">View case study →</span>
+            </article>
+          </div>
         </div>
       </div>
     </section>
@@ -163,22 +158,84 @@
         <p class="kicker reveal">04 — Capabilities</p>
         <h2 class="title reveal">Technical <em>skills</em></h2>
         <div class="skills">
-          <div class="skill-col glass grad-border reveal">
-            <h4>Programming</h4>
-            <ul><li>Python</li><li>C</li><li>JavaScript</li><li>Dart</li></ul>
+          <div class="assemble">
+            <div class="skill-col glass grad-border">
+              <h4>Programming</h4>
+              <ul><li>Python</li><li>C</li><li>JavaScript</li><li>Dart</li></ul>
+            </div>
           </div>
-          <div class="skill-col glass grad-border reveal">
-            <h4>Web &amp; Mobile</h4>
-            <ul><li>HTML5 / CSS3</li><li>React.js</li><li>Node.js</li><li>Flutter</li><li>Web Design · UI/UX</li><li>PyQt6</li></ul>
+          <div class="assemble">
+            <div class="skill-col glass grad-border">
+              <h4>Web &amp; Mobile</h4>
+              <ul><li>HTML5 / CSS3</li><li>React.js</li><li>Node.js</li><li>Flutter</li><li>Web Design · UI/UX</li><li>PyQt6</li></ul>
+            </div>
           </div>
-          <div class="skill-col glass grad-border reveal">
-            <h4>AI &amp; Machine Learning</h4>
-            <ul><li>OpenCV</li><li>YOLO</li><li>PyTorch</li><li>TensorFlow</li><li>Pandas</li><li>CUDA / GPU</li><li>ML Kit</li></ul>
+          <div class="assemble">
+            <div class="skill-col glass grad-border">
+              <h4>AI &amp; Machine Learning</h4>
+              <ul><li>OpenCV</li><li>YOLO</li><li>PyTorch</li><li>TensorFlow</li><li>Pandas</li><li>CUDA / GPU</li><li>ML Kit</li></ul>
+            </div>
           </div>
-          <div class="skill-col glass grad-border reveal">
-            <h4>Data &amp; Tools</h4>
-            <ul><li>MySQL</li><li>Supabase</li><li>Firebase</li><li>REST APIs</li><li>Git / GitHub</li><li>Docker · Linux</li><li>Postman</li></ul>
+          <div class="assemble">
+            <div class="skill-col glass grad-border">
+              <h4>Data &amp; Tools</h4>
+              <ul><li>MySQL</li><li>Supabase</li><li>Firebase</li><li>REST APIs</li><li>Git / GitHub</li><li>Docker · Linux</li><li>Postman</li></ul>
+            </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROCESS ============ -->
+    <section class="section" id="process">
+      <div class="container">
+        <p class="kicker reveal">05 — How I Work</p>
+        <h2 class="title reveal">From idea to <em>deployed</em></h2>
+        <div class="process-grid">
+          <div class="assemble"><div class="step glass grad-border">
+            <span class="step-no">01</span><h4>Discover</h4>
+            <p>Understand the real problem, the users and the goal before a line of code.</p>
+          </div></div>
+          <div class="assemble"><div class="step glass grad-border">
+            <span class="step-no">02</span><h4>Design</h4>
+            <p>Architect the system and craft a clean, intuitive interface and data flow.</p>
+          </div></div>
+          <div class="assemble"><div class="step glass grad-border">
+            <span class="step-no">03</span><h4>Build</h4>
+            <p>Develop with tested, maintainable code — frontend, backend and AI models.</p>
+          </div></div>
+          <div class="assemble"><div class="step glass grad-border">
+            <span class="step-no">04</span><h4>Deploy</h4>
+            <p>Ship to production, measure real results, then refine and iterate.</p>
+          </div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROOF ============ -->
+    <section class="section section-alt" id="proof">
+      <div class="container">
+        <p class="kicker reveal">06 — Proof &amp; Recognition</p>
+        <h2 class="title reveal">Real clients, <em>real results</em></h2>
+        <div class="proof-grid">
+          <a class="proof-card glass grad-border reveal" href="assets/cert-nakshatra.jpg" target="_blank" rel="noopener">
+            <div class="proof-img"><img src="assets/cert-nakshatra.jpg" alt="Certificate of Appreciation — Nakshatra IIT-JEE Academy" loading="lazy" /></div>
+            <div class="proof-body"><h4>Certificate of Appreciation</h4><p>Nakshatra IIT-JEE Academy — OMR scanning application</p></div>
+          </a>
+          <a class="proof-card glass grad-border reveal" href="assets/cert-inlighnx.jpg" target="_blank" rel="noopener">
+            <div class="proof-img"><img src="assets/cert-inlighnx.jpg" alt="Internship Completion — InLighnX Global" loading="lazy" /></div>
+            <div class="proof-body"><h4>Front-end Internship</h4><p>InLighnX Global Pvt. Ltd. — completion certificate</p></div>
+          </a>
+          <a class="proof-card glass grad-border reveal" href="assets/cert-konic.jpg" target="_blank" rel="noopener">
+            <div class="proof-img"><img src="assets/cert-konic.jpg" alt="Internship Certificate — Konic Technologies" loading="lazy" /></div>
+            <div class="proof-body"><h4>Web Development Internship</h4><p>Konic Technologies — certificate of internship</p></div>
+          </a>
+        </div>
+        <div class="proof-clients reveal">
+          <span>Trusted by</span>
+          <strong>Sri Bramharamba Real Estate</strong><i>·</i>
+          <strong>Nakshatra IIT-JEE Academy</strong><i>·</i>
+          <strong>2 Educational Institutions</strong>
         </div>
       </div>
     </section>
@@ -186,7 +243,7 @@
     <!-- ============ EDUCATION ============ -->
     <section class="section" id="education">
       <div class="container">
-        <p class="kicker reveal">05 — Education &amp; Honours</p>
+        <p class="kicker reveal">07 — Education &amp; Honours</p>
         <h2 class="title reveal">The <em>foundation</em></h2>
         <div class="edu-grid">
           <div class="edu-card glass grad-border reveal">
@@ -217,8 +274,19 @@
     <!-- ============ CONTACT ============ -->
     <section class="section section-dark" id="contact">
       <div class="container contact-inner">
-        <p class="kicker reveal">06 — Contact</p>
+        <p class="kicker reveal">08 — Contact</p>
         <h2 class="title reveal">Let's build something <em>worth paying for</em></h2>
+        <form class="contact-form reveal" action="https://formsubmit.co/ridahuda03@gmail.com" method="POST">
+          <input type="hidden" name="_subject" value="New message from your portfolio" />
+          <input type="hidden" name="_captcha" value="false" />
+          <input type="hidden" name="_template" value="table" />
+          <div class="cf-row">
+            <input type="text" name="name" placeholder="Your name" required />
+            <input type="email" name="email" placeholder="Your email" required />
+          </div>
+          <textarea name="message" rows="4" placeholder="Tell me about your project…" required></textarea>
+          <button type="submit" class="btn btn-light">Send Message →</button>
+        </form>
         <a class="contact-mail reveal" href="mailto:ridahuda03@gmail.com">ridahuda03@gmail.com</a>
         <p class="contact-phone reveal">+91 90100 30579 · Kandukur, Andhra Pradesh</p>
         <div class="contact-links reveal">
@@ -237,7 +305,18 @@
     </section>
   </main>
 
+  <!-- ============ CASE-STUDY OVERLAY ============ -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="overlay-backdrop" data-close></div>
+    <div class="overlay-panel" role="dialog" aria-modal="true">
+      <button class="overlay-close" data-close aria-label="Close case study">×</button>
+      <div class="overlay-content" id="overlay-content"></div>
+    </div>
+  </div>
+
   <script src="three.min.js"></script>
+  <script src="gsap.min.js"></script>
+  <script src="ScrollTrigger.min.js"></script>
   <script src="portfolio.js"></script>
 </body>
 </html>
