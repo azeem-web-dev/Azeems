@@ -174,9 +174,9 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x0b0b0d, 10, 22);
   const camera = new THREE.PerspectiveCamera(44, 1, 0.1, 100);
-  const camBase = new THREE.Vector3(2.6, 2.55, 6.6);
+  const camBase = new THREE.Vector3(2.5, 2.6, 7.3);
   camera.position.copy(camBase);
-  const lookTarget = new THREE.Vector3(0.3, 1.9, -0.5);
+  const lookTarget = new THREE.Vector3(-0.55, 1.7, -0.3);
 
   const mat = (c, r = 0.75, m = 0.05) => new THREE.MeshStandardMaterial({ color: c, roughness: r, metalness: m });
   const matDesk = mat(0x242428, 0.6), matMetal = mat(0x3a3a40, 0.4, 0.6), matBody = mat(0x141417, 0.9),
@@ -257,24 +257,73 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   monitor.children[monitor.children.length - 1].position.set(0, 2.0, -0.64);
   root.add(monitor);
 
-  // glow spill
-  const gc = document.createElement("canvas"); gc.width = gc.height = 256;
-  const gx = gc.getContext("2d");
-  const grd = gx.createRadialGradient(128, 128, 10, 128, 128, 128);
-  grd.addColorStop(0, "rgba(255,255,255,0.6)"); grd.addColorStop(1, "rgba(255,255,255,0)");
-  gx.fillStyle = grd; gx.fillRect(0, 0, 256, 256);
-  const glow = new THREE.Mesh(new THREE.PlaneGeometry(9, 7), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(gc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
-  glow.position.set(0, 2.1, -1.0); root.add(glow);
+  // ---------- white-brick desk gear (auto-placed under the hands after the model loads) ----------
+  const brickMat = new THREE.MeshStandardMaterial({ color: 0xf2f2f4, roughness: 0.55, metalness: 0.05 });
+  const kbdL = meshAt(round(0.85, 0.16, 0.74), brickMat, -0.45, 0.22, 0.5);   // keyboard = two clean white bricks
+  const kbdR = meshAt(round(0.85, 0.16, 0.74), brickMat, 0.45, 0.22, 0.5);
+  const mouse = meshAt(round(0.44, 0.12, 0.58), brickMat, 2.0, 0.20, 0.45);   // mouse (white brick)
+  root.add(kbdL); root.add(kbdR); root.add(mouse);
+  const BR = window.BR = { kx: 1.25, ky: 0.35, kz: 0.53, gap: 0.46, mx: 2.6, my: 0.3, mz: 0.35 };
+  function applyBricks() {
+    kbdL.position.set(BR.kx - BR.gap, BR.ky, BR.kz);
+    kbdR.position.set(BR.kx + BR.gap, BR.ky, BR.kz);
+    mouse.position.set(BR.mx, BR.my, BR.mz);
+  }
+  window.__applyBricks = applyBricks; applyBricks();
+  // a couple of tidy props on the left so the desk isn't bare
+  root.add(meshAt(new THREE.CylinderGeometry(0.22, 0.26, 0.08, 16), matMetal, -2.6, 0.18, -0.5));   // coaster
+  root.add(meshAt(new THREE.CylinderGeometry(0.16, 0.14, 0.34, 16), matMetal, -2.55, 0.34, -0.5));  // mug
 
-  root.add(meshAt(round(3.0, 0.07, 0.72), matLight, 0.4, 0.2, 0.55));   // keyboard (wide, under the hands)
-  root.add(meshAt(round(0.42, 0.05, 0.6), matLight, 2.3, 0.2, 0.5));    // mouse + pad
-  root.add(meshAt(new THREE.CylinderGeometry(0.16, 0.14, 0.34, 16), matLight, 2.9, 0.34, -0.3)); // mug (moved back)
-  root.add(meshAt(new THREE.CylinderGeometry(0.22, 0.26, 0.08, 16), matMetal, -2.5, 0.18, -0.6));
-  const lampArm = meshAt(round(0.07, 1.2, 0.07), matMetal, -2.5, 0.78, -0.6); lampArm.rotation.z = 0.5; root.add(lampArm);
-  root.add(meshAt(new THREE.ConeGeometry(0.26, 0.34, 16), matMetal, -2.95, 1.3, -0.6));
-  root.add(meshAt(new THREE.CylinderGeometry(0.2, 0.16, 0.34, 12), matMetal, -1.9, 0.32, -0.75)); // pen pot (left)
-  [[0, 0.7], [0.16, 0.62], [-0.16, 0.62]].forEach(([dx, dy]) => root.add(meshAt(new THREE.IcosahedronGeometry(0.2, 0), matLight, -1.9 + dx, 0.32 + dy, -0.75)));
-  root.add(meshAt(round(1.7, 1.7, 0.2), matChair, 0, 1.0, 2.05));
+  // ---------- ergonomic office chair (viewed from the back) ----------
+  function buildChair() {
+    const g = new THREE.Group();
+    const frameMat = new THREE.MeshStandardMaterial({ color: 0x595e6a, roughness: 0.5, metalness: 0.35 });
+    // ergonomic mesh-back texture (grid; holes let the screen glow through)
+    const mc = document.createElement("canvas"); mc.width = mc.height = 128;
+    const m2 = mc.getContext("2d"); m2.strokeStyle = "rgba(150,156,172,1)"; m2.lineWidth = 5;
+    for (let i = 0; i <= 128; i += 16) { m2.beginPath(); m2.moveTo(i, 0); m2.lineTo(i, 128); m2.stroke(); m2.beginPath(); m2.moveTo(0, i); m2.lineTo(128, i); m2.stroke(); }
+    const meshTex = new THREE.CanvasTexture(mc); meshTex.wrapS = meshTex.wrapT = THREE.RepeatWrapping; meshTex.repeat.set(7, 7);
+    const meshMat = new THREE.MeshStandardMaterial({ map: meshTex, transparent: true, opacity: 0.95, color: 0x5b6070, roughness: 0.8, metalness: 0.25, side: THREE.DoubleSide });
+    const cx = 0.1, bz = 1.55;
+    g.add(meshAt(round(1.55, 0.22, 1.4), frameMat, cx, 0.02, bz - 0.4));                          // seat
+    // mid-back rest: thin frame + ergonomic mesh insert (kept low so the terminal stays clear)
+    const back = new THREE.Group();
+    back.add(meshAt(round(1.6, 1.9, 0.1), frameMat, 0, 0, 0.02));                                 // outer frame
+    back.add(meshAt(round(1.3, 1.5, 0.14), meshMat, 0, -0.05, 0));                                // mesh insert
+    back.position.set(cx, 0.98, bz + 0.16); back.rotation.x = 0.12; g.add(back);
+    g.add(meshAt(round(0.1, 0.34, 0.1), frameMat, cx, 1.92, bz + 0.34));                          // headrest post
+    g.add(meshAt(round(0.95, 0.4, 0.22), frameMat, cx, 2.12, bz + 0.34));                         // headrest
+    [-1.0, 1.0].forEach((dx) => {                                                                 // armrests
+      g.add(meshAt(round(0.14, 0.5, 0.14), frameMat, cx + dx, 0.42, bz - 0.5));
+      g.add(meshAt(round(0.17, 0.14, 1.0), frameMat, cx + dx, 0.72, bz - 0.75));
+    });
+    g.rotation.y = -0.13;                                                                         // slight 3/4 angle
+    g.add(meshAt(new THREE.CylinderGeometry(0.13, 0.15, 1.0, 14), frameMat, cx, -0.62, bz - 0.4)); // gas lift
+    for (let i = 0; i < 5; i++) {                                                                 // 5-star base + castors
+      const a = i / 5 * Math.PI * 2, dx = Math.sin(a) * 0.6, dz = Math.cos(a) * 0.6;
+      const leg = meshAt(round(0.17, 0.1, 1.15), frameMat, cx + dx, -1.1, (bz - 0.4) + dz);
+      leg.rotation.y = -a; g.add(leg);
+      g.add(meshAt(new THREE.CylinderGeometry(0.1, 0.1, 0.14, 10), frameMat, cx + dx * 1.9, -1.24, (bz - 0.4) + dz * 1.9));
+    }
+    return g;
+  }
+  root.add(buildChair());
+
+  // ---------- hanging pendant lamp (light from above) + pull-cord on/off ----------
+  const LX = 0.2, LY = 3.55, LZ = 0.1;
+  const shadeMat = new THREE.MeshStandardMaterial({ color: 0x14151a, roughness: 0.4, metalness: 0.7, side: THREE.DoubleSide });
+  const shadeInMat = new THREE.MeshStandardMaterial({ color: 0xfff3da, emissive: 0xffdf9e, emissiveIntensity: 1, roughness: 0.9, side: THREE.BackSide });
+  const bulbMat = new THREE.MeshStandardMaterial({ color: 0xfff7e6, emissive: 0xffd98a, emissiveIntensity: 2.2 });
+  root.add(meshAt(new THREE.CylinderGeometry(0.03, 0.03, 3.2, 8), matMetal, LX, LY + 1.7, LZ));     // cord up out of frame
+  root.add(meshAt(new THREE.CylinderGeometry(0.09, 0.13, 0.14, 14), matMetal, LX, LY + 0.4, LZ));   // ceiling cap
+  const shade = new THREE.Mesh(new THREE.ConeGeometry(0.66, 0.74, 30, 1, true), shadeMat); shade.position.set(LX, LY, LZ); root.add(shade);
+  const shadeIn = new THREE.Mesh(new THREE.ConeGeometry(0.63, 0.7, 30, 1, true), shadeInMat); shadeIn.position.set(LX, LY, LZ); root.add(shadeIn);
+  const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.17, 18, 18), bulbMat); bulb.position.set(LX, LY - 0.2, LZ); root.add(bulb);
+  // pull cord + knob (click to toggle)
+  const cordGrp = new THREE.Group(); cordGrp.position.set(LX + 0.52, LY - 0.15, LZ); root.add(cordGrp);
+  cordGrp.add(meshAt(new THREE.CylinderGeometry(0.011, 0.011, 0.52, 6), matMetal, 0, -0.26, 0));
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 12), new THREE.MeshStandardMaterial({ color: 0xe2e4ea, metalness: 0.6, roughness: 0.3 }));
+  knob.position.set(0, -0.56, 0); knob.userData.pull = true; cordGrp.add(knob);
 
   // desk modesty front panel — hides the seated lower body
   root.add(meshAt(round(6.6, 1.75, 0.18), matDesk, 0, -0.8, 1.5));
@@ -282,12 +331,12 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   /* ---- developer: a REAL rigged character (Xbot), posed & typing ---- */
   // tweak live in console via window.POSE + window.__applyPose()
   const POSE = window.POSE = {
-    pos: [0.15, -2.2, 0.88], scale: 4.4,
-    spine: [0.24, 0, 0], spine1: [0.14, 0, 0], spine2: [0.10, 0, 0],
-    neck: [0.12, 0, 0], head: [0.18, 0, 0],
+    pos: [0.15, -2.65, 0.85], scale: 4.4,
+    spine: [0.30, 0, 0], spine1: [0.16, 0, 0], spine2: [0.10, 0, 0],
+    neck: [0.12, 0, 0], head: [0.24, 0, 0],
     lShoulder: [0, 0, 0], rShoulder: [0, 0, 0],
-    lArm: [0.12, 0.30, 1.60], rArm: [0.12, -0.30, -1.60],
-    lFore: [0.0, 0.70, 0.95], rFore: [0.0, -0.70, -0.95],
+    lArm: [0.12, 0.28, 1.70], rArm: [0.12, -0.28, -1.70],
+    lFore: [0.0, 0.70, 1.00], rFore: [0.0, -0.70, -1.00],
     lHand: [-0.50, 0.10, 0.0], rHand: [-0.50, -0.10, 0.0],
     fingerCurl: 0.5, fingerAxis: "x",
   };
@@ -331,18 +380,51 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     charReady = true;
   });
 
-  scene.add(new THREE.AmbientLight(0x2a2b33, 0.7));
-  const screenLight = new THREE.PointLight(0xdfe6ff, 3.2, 18, 2); screenLight.position.set(0, 2.0, 0.1); scene.add(screenLight);
-  const rim = new THREE.DirectionalLight(0xaab4c8, 1.0); rim.position.set(6, 6, 7); scene.add(rim);
-  const fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(-5, 4, 5); scene.add(fill);
-  const backRim = new THREE.DirectionalLight(0x7d93ff, 1.1); backRim.position.set(-4, 6, -5); scene.add(backRim); // cool rim to separate the figure
+  const ambient = new THREE.AmbientLight(0x2a2b33, 0.5); scene.add(ambient);
+  const screenLight = new THREE.PointLight(0xdfe6ff, 2.4, 18, 2); screenLight.position.set(0, 2.0, 0.1); scene.add(screenLight);
+  const rim = new THREE.DirectionalLight(0xaab4c8, 0.8); rim.position.set(6, 6, 7); scene.add(rim);
+  const fill = new THREE.DirectionalLight(0xcdd6e6, 0.5); fill.position.set(3.5, 2.5, 8); scene.add(fill); // front fill reveals the chair form
+  const backRim = new THREE.DirectionalLight(0x7d93ff, 1.0); backRim.position.set(-4, 6, -5); scene.add(backRim);
+
+  // pendant lamp lights — a down-cone over the desk + a soft up-spill (light in two directions)
+  const lampSpot = new THREE.SpotLight(0xffdfac, 0, 30, 0.66, 0.7, 1.3);
+  lampSpot.position.set(LX, LY - 0.2, LZ); lampSpot.target.position.set(0.15, 0.2, 0.5);
+  scene.add(lampSpot); scene.add(lampSpot.target);
+  const lampUp = new THREE.PointLight(0xffe2b0, 0, 9, 2); lampUp.position.set(LX, LY + 0.3, LZ); scene.add(lampUp);
+
+  let lampOn = true;
+  function setLamp(on) {
+    lampOn = on;
+    lampSpot.intensity = on ? 4.0 : 0;
+    lampUp.intensity = on ? 0.4 : 0;
+    bulbMat.emissiveIntensity = on ? 2.2 : 0.06;
+    shadeInMat.emissiveIntensity = on ? 1.0 : 0.05;
+    ambient.intensity = on ? 0.5 : 0.16;
+    fill.intensity = on ? 0.5 : 0.32;
+    rim.intensity = on ? 0.8 : 0.45;
+  }
+  window.__toggleLamp = () => setLamp(!lampOn);
+  setLamp(true);
 
   let mx = 0, my = 0;
   window.addEventListener("mousemove", (e) => { mx = e.clientX / window.innerWidth - 0.5; my = e.clientY / window.innerHeight - 0.5; });
+
+  // click the hanging lamp / pull-cord to switch it on & off
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), lampHit = [knob, shade, shadeIn, bulb];
+  let pullT = 0;
+  function hitLamp(e) {
+    const r = canvas.getBoundingClientRect();
+    ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    ray.setFromCamera(ndc, camera);
+    return ray.intersectObjects(lampHit, false).length > 0;
+  }
+  canvas.addEventListener("mousemove", (e) => { canvas.style.cursor = hitLamp(e) ? "pointer" : ""; });
+  canvas.addEventListener("click", (e) => { if (hitLamp(e)) { setLamp(!lampOn); pullT = 0.45; } });
   function resize() {
     const w = canvas.clientWidth || window.innerWidth, h = canvas.clientHeight || window.innerHeight;
     renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
-    root.position.x = w > 980 ? 1.1 : 0;
+    root.position.x = w > 980 ? 1.55 : 0;
   }
   window.addEventListener("resize", resize); resize();
 
@@ -362,7 +444,12 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       fingersR.forEach((f) => { f.b.rotation[ax] = f.base + Math.max(0, Math.sin(t * f.sp + f.ph)) * 0.28; });
     }
     root.position.y = Math.sin(t * 0.6) * 0.04;
-    screenLight.intensity = 3.2 + Math.sin(t * 9) * 0.08;
+    screenLight.intensity = 2.4 + Math.sin(t * 9) * 0.07;
+    // pendant lamp: gentle sway + cord-yank feedback + subtle bulb flicker
+    const sway = Math.sin(t * 0.8) * 0.02;
+    cordGrp.rotation.z = sway * 2 - (pullT > 0 ? Math.sin((0.45 - pullT) * 32) * 0.13 : 0);
+    if (pullT > 0) pullT = Math.max(0, pullT - dt);
+    if (lampOn) { const fl = 1 + Math.sin(t * 22) * 0.015; bulbMat.emissiveIntensity = 2.2 * fl; lampSpot.intensity = 4.0 * fl; }
     camera.position.x += (camBase.x + mx * 1.4 - camera.position.x) * 0.05;
     camera.position.y += (camBase.y - my * 0.9 - camera.position.y) * 0.05;
     camera.lookAt(root.position.x + lookTarget.x, lookTarget.y, lookTarget.z);
