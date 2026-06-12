@@ -200,7 +200,9 @@ em { font-style: normal; }
 .t-desc { color: var(--ink-soft); font-weight: 300; max-width: 660px; }
 
 /* ---------- Projects ---------- */
-.projects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; align-items: stretch; }
+/* gap equals the container side padding (40px) so the space before, between
+   and after the cards is identical and the row reads evenly across the screen */
+.projects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; align-items: stretch; }
 .card { display: flex; flex-direction: column; border-radius: 18px; padding: 34px 30px; cursor: pointer; transition: transform 0.4s cubic-bezier(.22,.61,.36,1); }
 .card:hover { transform: perspective(900px) translateY(-8px) rotateX(3deg); }
 .card:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
@@ -359,7 +361,7 @@ em { font-style: normal; }
 /* ===========================================================
    Skill galaxy — orbiting skill satellites around category cores
    =========================================================== */
-.skill-galaxy { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px 16px; justify-items: center; margin-top: 8px; }
+.skill-galaxy { display: grid; grid-template-columns: repeat(2, 1fr); gap: 56px 64px; justify-items: center; margin-top: 8px; }
 .orbit { position: relative; width: min(100%, 360px); aspect-ratio: 1; opacity: 0; transform: translateY(24px); transition: opacity 0.8s ease, transform 0.8s ease; }
 .orbit.in { opacity: 1; transform: none; }
 
@@ -441,7 +443,7 @@ em { font-style: normal; }
   .t-date { font-size: 12.5px; }
   .t-org { font-size: 15px; }
 
-  .projects { gap: 44px; }
+  .projects { gap: 56px; }
   .card { padding: 42px 38px; }
   .card-name { font-size: 25px; }
   .card-desc { font-size: 15.5px; }
@@ -449,7 +451,7 @@ em { font-style: normal; }
   .card-badge { font-size: 11px; }
   .card-no { font-size: 32px; }
 
-  .skill-galaxy { gap: 44px 28px; }
+  .skill-galaxy { gap: 70px 90px; }
   .orbit { width: min(100%, 460px); }
   .orbit-core { width: 152px; height: 152px; }
   .orbit-core span { font-size: 16.5px; }
@@ -502,4 +504,49 @@ em { font-style: normal; }
   .t-role { font-size: 31px; }
   .stat-num, .stat-unit { font-size: 60px; }
   .stat-unit { font-size: 36px; }
+}
+
+/* ===========================================================
+   Process pipeline — a live build pipeline; a comet runs the
+   track and lights each stage as it passes (Discover→Deploy)
+   =========================================================== */
+.pipeline { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 30px; --p: 0; }
+.pl-line { position: absolute; top: 36px; left: 12.5%; right: 12.5%; height: 2px; background: rgba(14,14,16,0.12); border-radius: 2px; z-index: 0; }
+.pl-fill { position: absolute; left: 0; top: 0; height: 100%; width: calc(var(--p) * 100%); background: var(--ink); border-radius: 2px; }
+.pl-comet { position: absolute; top: 50%; left: calc(var(--p) * 100%); width: 10px; height: 10px; border-radius: 50%; background: var(--ink); transform: translate(-50%, -50%); box-shadow: 0 0 0 4px rgba(14,14,16,0.12), 0 0 18px 3px rgba(14,14,16,0.55); }
+
+.pl-stage { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 18px; z-index: 1; }
+.pl-node {
+  width: 72px; height: 72px; border-radius: 50%; background: var(--bg-2); border: 2px solid rgba(14,14,16,0.18);
+  display: grid; place-items: center; color: var(--ink-soft); margin-bottom: 22px;
+  transition: transform 0.4s ease, background 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.pl-node svg { width: 30px; height: 30px; }
+.pl-stage.active .pl-node {
+  background: var(--ink); border-color: var(--ink); color: #fff; transform: scale(1.12);
+  box-shadow: 0 14px 34px rgba(14,14,16,0.28), 0 0 0 8px rgba(14,14,16,0.06);
+}
+.pl-no { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; color: var(--ink-soft); transition: color 0.4s ease; }
+.pl-body h4 { font-family: var(--disp); font-size: 22px; font-weight: 600; margin: 8px 0 10px; transition: letter-spacing 0.4s ease; }
+.pl-body p { font-size: 14px; font-weight: 300; color: var(--ink-soft); max-width: 230px; transition: color 0.4s ease; }
+.pl-stage.active .pl-no { color: var(--ink); }
+.pl-stage.active .pl-body h4 { letter-spacing: 0.4px; }
+.pl-stage.active .pl-body p { color: var(--ink-2); }
+
+@media (min-width: 1600px) {
+  .pl-line { top: 42px; }
+  .pl-node { width: 84px; height: 84px; }
+  .pl-node svg { width: 34px; height: 34px; }
+  .pl-body h4 { font-size: 25px; }
+  .pl-body p { font-size: 15.5px; max-width: 260px; }
+}
+
+@media (max-width: 760px) {
+  .pipeline { grid-template-columns: 1fr; gap: 30px; justify-items: start; padding-left: 18px; --p: 0; }
+  .pl-line { top: 0; bottom: 0; left: 36px; right: auto; width: 2px; height: auto; }
+  .pl-fill { width: 100%; height: calc(var(--p) * 100%); }
+  .pl-comet { left: 50%; top: calc(var(--p) * 100%); }
+  .pl-stage { flex-direction: row; align-items: flex-start; text-align: left; gap: 20px; padding: 0; }
+  .pl-node { margin-bottom: 0; flex: 0 0 auto; width: 60px; height: 60px; }
+  .pl-body p { max-width: none; }
 }

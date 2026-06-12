@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="portfolio.css?v=17" />
+  <link rel="stylesheet" href="portfolio.css?v=18" />
 </head>
 <body>
 
@@ -91,14 +91,6 @@
           <span class="j-node jn-2" style="left:24%; top:50%" aria-hidden="true"></span>
           <span class="j-node jn-3" style="left:50%; top:88%" aria-hidden="true"></span>
           <article class="j-card jc-1 glass reveal">
-            <p class="t-date">2023 — Present</p>
-            <h3 class="t-role">Co-Founder, CEO &amp; Lead Developer</h3>
-            <p class="t-org">HMGenX</p>
-            <p class="t-desc">Leading a team delivering full-stack web, mobile &amp; desktop apps and
-            AI software &amp; automation for clients — owning everything from requirements to
-            deployment. Shipped multiple paid projects generating ₹60,000+ in revenue.</p>
-          </article>
-          <article class="j-card jc-2 glass reveal" data-from="right">
             <p class="t-date">Jul — Sep 2025</p>
             <h3 class="t-role">Front-end Development Intern</h3>
             <p class="t-org">InLighnX Global Pvt. Ltd.</p>
@@ -106,12 +98,20 @@
             translation, voice input, TTS and local history — JavaScript (Web Speech API), GSAP,
             LocalStorage.</p>
           </article>
-          <article class="j-card jc-3 glass reveal">
+          <article class="j-card jc-2 glass reveal" data-from="right">
             <p class="t-date">Apr — Jul 2025</p>
             <h3 class="t-role">Web Development Intern</h3>
             <p class="t-org">Konic Technologies</p>
             <p class="t-desc">Worked across front-end and back-end web technologies, contributing to
             real-time client projects.</p>
+          </article>
+          <article class="j-card jc-3 glass reveal">
+            <p class="t-date">2023 — Present</p>
+            <h3 class="t-role">Co-Founder, CEO &amp; Lead Developer</h3>
+            <p class="t-org">HMGenX</p>
+            <p class="t-desc">Leading a team delivering full-stack web, mobile &amp; desktop apps and
+            AI software &amp; automation for clients — owning everything from requirements to
+            deployment. Shipped multiple paid projects generating ₹60,000+ in revenue.</p>
           </article>
         </div>
       </div>
@@ -181,23 +181,24 @@
       <div class="container">
         <p class="kicker reveal">05 — How I Work</p>
         <h2 class="title reveal">From idea to <em>deployed</em></h2>
-        <div class="process-grid">
-          <div class="assemble"><div class="step glass">
-            <span class="step-no">01</span><h4>Discover</h4>
-            <p>Understand the real problem, the users and the goal before a line of code.</p>
-          </div></div>
-          <div class="assemble"><div class="step glass">
-            <span class="step-no">02</span><h4>Design</h4>
-            <p>Architect the system and craft a clean, intuitive interface and data flow.</p>
-          </div></div>
-          <div class="assemble"><div class="step glass">
-            <span class="step-no">03</span><h4>Build</h4>
-            <p>Develop with tested, maintainable code — frontend, backend and AI models.</p>
-          </div></div>
-          <div class="assemble"><div class="step glass">
-            <span class="step-no">04</span><h4>Deploy</h4>
-            <p>Ship to production, measure real results, then refine and iterate.</p>
-          </div></div>
+        <div class="pipeline" id="pipeline">
+          <div class="pl-line"><span class="pl-fill"></span><span class="pl-comet"></span></div>
+          <div class="pl-stage">
+            <div class="pl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></div>
+            <div class="pl-body"><span class="pl-no">01</span><h4>Discover</h4><p>Understand the real problem, the users and the goal before a line of code.</p></div>
+          </div>
+          <div class="pl-stage">
+            <div class="pl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l3-1 11-11-2-2L4 18l-1 3z"/><path d="M14 7l3 3"/><path d="M14 4h6v6"/></svg></div>
+            <div class="pl-body"><span class="pl-no">02</span><h4>Design</h4><p>Architect the system and craft a clean, intuitive interface and data flow.</p></div>
+          </div>
+          <div class="pl-stage">
+            <div class="pl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 6 3 12 8 18"/><polyline points="16 6 21 12 16 18"/></svg></div>
+            <div class="pl-body"><span class="pl-no">03</span><h4>Build</h4><p>Develop with tested, maintainable code — frontend, backend and AI models.</p></div>
+          </div>
+          <div class="pl-stage">
+            <div class="pl-node"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2c.9-.9.9-2.4 0-3.3-.9-.9-2.1-.6-3 .3z"/><path d="M9 13c1-3 3.5-7 9-7 0 5.5-4 8-7 9z"/><circle cx="15" cy="9" r="1.2"/></svg></div>
+            <div class="pl-body"><span class="pl-no">04</span><h4>Deploy</h4><p>Ship to production, measure real results, then refine and iterate.</p></div>
+          </div>
         </div>
       </div>
     </section>
@@ -307,6 +308,6 @@
   <script src="three.min.js"></script>
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
-  <script src="portfolio.js?v=17"></script>
+  <script src="portfolio.js?v=18"></script>
 </body>
 </html>

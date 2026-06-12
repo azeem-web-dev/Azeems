@@ -514,3 +514,33 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }, { threshold: 0.2 });
   io.observe(root);
 })();
+
+/* ===========================================================
+   Process pipeline — comet runs the track, lighting each stage
+   =========================================================== */
+(function processPipeline() {
+  const pipe = document.getElementById("pipeline");
+  if (!pipe) return;
+  const stages = [...pipe.querySelectorAll(".pl-stage")];
+  const comet = pipe.querySelector(".pl-comet");
+  const nps = stages.map((_, i) => i / (stages.length - 1));
+
+  let visible = true;
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(pipe);
+
+  const TRAVEL = 6000, HOLD = 1700, RESET = 700, CYCLE = TRAVEL + HOLD + RESET;
+  const ease = (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  let t0 = performance.now();
+
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    if (!visible) { t0 = now; return; }
+    const e = (now - t0) % CYCLE;
+    let p, lit;
+    if (e < TRAVEL) { p = ease(e / TRAVEL); lit = true; comet.style.opacity = 1; }
+    else if (e < TRAVEL + HOLD) { p = 1; lit = true; comet.style.opacity = 1; }
+    else { p = 0; lit = false; comet.style.opacity = 0; }      // reset: drain + un-light
+    pipe.style.setProperty("--p", p.toFixed(4));
+    stages.forEach((s, i) => s.classList.toggle("active", lit && p >= nps[i] - 0.0001));
+  })(t0);
+})();
