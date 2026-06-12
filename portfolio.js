@@ -347,7 +347,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   // draw each icon into an offscreen canvas, then collect opaque pixels
   function sample(draw) {
     const oc = document.createElement("canvas"); oc.width = S; oc.height = S;
-    const c = oc.getContext("2d"); c.fillStyle = "#fff"; draw(c);
+    const c = oc.getContext("2d"); c.fillStyle = "#fff"; c.strokeStyle = "#fff"; c.lineCap = "round"; draw(c);
     const d = c.getImageData(0, 0, S, S).data, pts = [];
     for (let y = 0; y < S; y += 2)
       for (let x = 0; x < S; x += 2)
@@ -356,14 +356,20 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }
 
   const icons = [
-    // 1 — programmer at a desk with a monitor (side view)
+    // 1 — programmer seated at a desk: chair, legs, monitor, keyboard
     (c) => {
-      rr(c, 38, 206, 224, 12, 4);                         // desk
-      rr(c, 182, 116, 78, 72, 8); rr(c, 214, 188, 12, 14, 2); rr(c, 196, 200, 48, 8, 3); // monitor + stand
-      rr(c, 120, 197, 52, 8, 3);                          // keyboard
-      c.beginPath(); c.arc(92, 116, 24, 0, 7); c.fill();  // head
-      c.beginPath(); c.moveTo(60, 206); c.lineTo(124, 206); c.lineTo(116, 148); c.lineTo(68, 148); c.closePath(); c.fill(); // torso
-      rr(c, 108, 158, 64, 12, 6);                         // arm to keyboard
+      rr(c, 40, 246, 224, 8, 3);                                  // floor
+      rr(c, 148, 162, 132, 10, 4); rr(c, 258, 172, 10, 74, 2);    // desk + leg
+      rr(c, 186, 104, 76, 52, 6); rr(c, 218, 156, 10, 6, 1);      // monitor + stand
+      rr(c, 154, 154, 36, 7, 3);                                  // keyboard
+      c.beginPath(); c.arc(84, 82, 20, 0, 7); c.fill();           // head
+      c.lineWidth = 26; c.beginPath(); c.moveTo(84, 112); c.lineTo(78, 172); c.stroke();   // torso
+      c.lineWidth = 11; c.beginPath(); c.moveTo(84, 124); c.quadraticCurveTo(120, 150, 160, 156); c.stroke(); // arm
+      c.lineWidth = 22; c.beginPath(); c.moveTo(78, 178); c.lineTo(130, 182); c.stroke();  // thigh
+      c.lineWidth = 12; c.beginPath(); c.moveTo(132, 184); c.lineTo(132, 238); c.stroke(); // shin
+      c.lineWidth = 9;  c.beginPath(); c.moveTo(132, 240); c.lineTo(154, 240); c.stroke(); // foot
+      rr(c, 46, 116, 10, 78, 4);                                  // chair backrest
+      rr(c, 50, 190, 62, 10, 4); rr(c, 76, 200, 8, 32, 2); rr(c, 58, 232, 46, 8, 4); // seat, post, base
     },
     // 2 — AI / robot head
     (c) => {
@@ -383,15 +389,20 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       c.beginPath(); c.arc(206, 170, 40, 0, 7); c.fill();
       rr(c, 92, 164, 132, 44, 22);
     },
-    // 4 — hacker (hooded figure)
+    // 4 — Kali-style dragon (stylized swirl)
     (c) => {
-      c.beginPath(); c.moveTo(68, 246); c.lineTo(232, 246); c.lineTo(206, 184); c.lineTo(94, 184); c.closePath(); c.fill(); // shoulders
-      c.beginPath(); c.ellipse(150, 126, 66, 74, 0, 0, 7); c.fill();   // hood
+      c.lineWidth = 26; c.beginPath(); c.moveTo(42, 108);
+      c.quadraticCurveTo(110, 52, 176, 82); c.quadraticCurveTo(232, 106, 238, 156); c.stroke(); // snout→neck→back
+      c.lineWidth = 18; c.beginPath(); c.moveTo(238, 156);
+      c.quadraticCurveTo(242, 212, 188, 220); c.quadraticCurveTo(140, 226, 148, 184); c.stroke(); // tail swirl
+      c.lineWidth = 11; c.beginPath(); c.moveTo(148, 184);
+      c.quadraticCurveTo(154, 162, 180, 168); c.stroke();              // inner curl
+      c.lineWidth = 9; c.beginPath(); c.moveTo(44, 120); c.quadraticCurveTo(80, 136, 116, 126); c.stroke(); // lower jaw
+      c.beginPath(); c.moveTo(120, 58); c.lineTo(136, 30); c.lineTo(150, 64); c.closePath(); c.fill(); // spike 1
+      c.beginPath(); c.moveTo(158, 60); c.lineTo(180, 40); c.lineTo(186, 74); c.closePath(); c.fill(); // spike 2
       c.globalCompositeOperation = "destination-out";
-      c.beginPath(); c.ellipse(150, 136, 40, 50, 0, 0, 7); c.fill();   // face cutout
+      c.beginPath(); c.arc(102, 80, 7, 0, 7); c.fill();                // eye
       c.globalCompositeOperation = "source-over";
-      c.beginPath(); c.arc(135, 138, 5, 0, 7); c.fill();               // eye glints
-      c.beginPath(); c.arc(165, 138, 5, 0, 7); c.fill();
     },
   ];
 
@@ -410,7 +421,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   function resize() {
     W = hero.clientWidth; H = hero.clientHeight;
     canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    box = Math.min(W * 0.34, H * 0.52, 390); ox = W * 0.72 - box / 2; oy = H * 0.47 - box / 2;
+    box = Math.min(W * 0.38, H * 0.58, 440); ox = W * 0.72 - box / 2; oy = H * 0.47 - box / 2;
   }
   window.addEventListener("resize", resize); resize();
 
@@ -441,7 +452,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
       const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
       // dense dots blend under 'lighter' into a solid, softly glowing silhouette
-      ctx.beginPath(); ctx.arc(px, py, 1.5, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, 1.1, 0, 7); ctx.fill();
     }
     ctx.globalCompositeOperation = "source-over";
   })(last);
