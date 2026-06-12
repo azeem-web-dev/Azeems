@@ -455,3 +455,62 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     ctx.globalCompositeOperation = "source-over";
   })(last);
 })();
+
+/* ===========================================================
+   Skill galaxy — build orbiting skill systems per category
+   =========================================================== */
+(function skillGalaxy() {
+  const root = document.getElementById("skill-galaxy");
+  if (!root) return;
+
+  const DATA = [
+    { label: "Programming",        r1: ["Python", "JavaScript"],            r2: ["C", "Dart"] },
+    { label: "Web & Mobile",       r1: ["HTML5 / CSS3", "React.js", "Node.js"], r2: ["Flutter", "UI / UX", "PyQt6"] },
+    { label: "AI & Machine Learning", r1: ["OpenCV", "YOLO", "PyTorch"],    r2: ["TensorFlow", "Pandas", "CUDA / GPU", "ML Kit"] },
+    { label: "Data & Tools",       r1: ["MySQL", "Supabase", "Firebase"],   r2: ["REST APIs", "Git / GitHub", "Docker · Linux", "Postman"] },
+  ];
+  const RF1 = 0.25, RF2 = 0.385;
+
+  function buildRing(items, rf, cls, startDeg) {
+    const ring = document.createElement("div"); ring.className = "ring " + cls;
+    items.forEach((txt, i) => {
+      const a = startDeg + (i / items.length) * 360;
+      const rad = a * Math.PI / 180;
+      const lx = 50 + rf * 100 * Math.cos(rad);
+      const ly = 50 + rf * 100 * Math.sin(rad);
+      const spoke = document.createElement("div"); spoke.className = "spoke";
+      spoke.style.width = (rf * 100) + "%"; spoke.style.transform = "rotate(" + a + "deg)";
+      ring.appendChild(spoke);
+      const sat = document.createElement("div"); sat.className = "sat";
+      sat.style.left = lx + "%"; sat.style.top = ly + "%";
+      const chip = document.createElement("span"); chip.className = "chip"; chip.textContent = txt;
+      sat.appendChild(chip); ring.appendChild(sat);
+    });
+    return ring;
+  }
+
+  DATA.forEach((cat) => {
+    const orbit = document.createElement("div"); orbit.className = "orbit";
+    const core = document.createElement("div"); core.className = "orbit-core";
+    const cs = document.createElement("span"); cs.textContent = cat.label; core.appendChild(cs);
+    orbit.appendChild(core);
+    [RF1, RF2].forEach((rf) => {
+      const path = document.createElement("div"); path.className = "orbit-path";
+      path.style.width = (rf * 200) + "%"; orbit.appendChild(path);
+    });
+    orbit.appendChild(buildRing(cat.r1, RF1, "ring-1", -90));
+    orbit.appendChild(buildRing(cat.r2, RF2, "ring-2", -50));
+    root.appendChild(orbit);
+  });
+
+  // fade each system in as it scrolls into view
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (!e.isIntersecting) return;
+      const items = [...root.children];
+      items.forEach((el, idx) => setTimeout(() => el.classList.add("in"), idx * 120));
+      io.disconnect();
+    });
+  }, { threshold: 0.2 });
+  io.observe(root);
+})();

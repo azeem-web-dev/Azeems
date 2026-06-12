@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="portfolio.css?v=15" />
+  <link rel="stylesheet" href="portfolio.css?v=16" />
 </head>
 <body>
 
@@ -166,32 +166,13 @@
       <div class="container">
         <p class="kicker reveal">04 — Capabilities</p>
         <h2 class="title reveal">Technical <em>skills</em></h2>
-        <div class="skills">
-          <div class="assemble">
-            <div class="skill-col glass">
-              <h4>Programming</h4>
-              <ul><li>Python</li><li>C</li><li>JavaScript</li><li>Dart</li></ul>
-            </div>
-          </div>
-          <div class="assemble">
-            <div class="skill-col glass">
-              <h4>Web &amp; Mobile</h4>
-              <ul><li>HTML5 / CSS3</li><li>React.js</li><li>Node.js</li><li>Flutter</li><li>Web Design · UI/UX</li><li>PyQt6</li></ul>
-            </div>
-          </div>
-          <div class="assemble">
-            <div class="skill-col glass">
-              <h4>AI &amp; Machine Learning</h4>
-              <ul><li>OpenCV</li><li>YOLO</li><li>PyTorch</li><li>TensorFlow</li><li>Pandas</li><li>CUDA / GPU</li><li>ML Kit</li></ul>
-            </div>
-          </div>
-          <div class="assemble">
-            <div class="skill-col glass">
-              <h4>Data &amp; Tools</h4>
-              <ul><li>MySQL</li><li>Supabase</li><li>Firebase</li><li>REST APIs</li><li>Git / GitHub</li><li>Docker · Linux</li><li>Postman</li></ul>
-            </div>
-          </div>
-        </div>
+        <div class="skill-galaxy" id="skill-galaxy"></div>
+        <ul class="skills-fallback" hidden>
+          <li>Programming: Python, C, JavaScript, Dart</li>
+          <li>Web &amp; Mobile: HTML5 / CSS3, React.js, Node.js, Flutter, UI/UX, PyQt6</li>
+          <li>AI &amp; Machine Learning: OpenCV, YOLO, PyTorch, TensorFlow, Pandas, CUDA / GPU, ML Kit</li>
+          <li>Data &amp; Tools: MySQL, Supabase, Firebase, REST APIs, Git / GitHub, Docker · Linux, Postman</li>
+        </ul>
       </div>
     </section>
 
@@ -326,6 +307,6 @@
   <script src="three.min.js"></script>
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
-  <script src="portfolio.js?v=15"></script>
+  <script src="portfolio.js?v=16"></script>
 </body>
 </html>
