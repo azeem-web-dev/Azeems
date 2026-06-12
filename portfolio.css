@@ -624,3 +624,12 @@ em { font-style: normal; }
   .fd-year { display: none; }
   .fd-score { font-size: 26px; }
 }
+
+
+/* ---------- Reduced motion: stop decorative animation ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .ring, .ring .sat .chip, .hero-eyebrow .dot, .pl-comet { animation: none !important; }
+  .pl-comet { opacity: 0 !important; }
+  .j-liquid { stroke-dashoffset: 0 !important; }
+  html { scroll-behavior: auto; }
+}

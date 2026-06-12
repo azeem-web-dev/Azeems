@@ -4,6 +4,9 @@
    3D developer desk with a LIVE typing terminal
    =========================================================== */
 
+/* honour the user's motion preference: canvas loops render once, then stop */
+const REDUCED_MOTION = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /* ---------- Nav state ---------- */
 const nav = document.getElementById("nav");
 window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.scrollY > 60));
@@ -202,10 +205,16 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }
   window.addEventListener("resize", resize); resize();
 
+  // render only while the hero is on screen (saves CPU/GPU/battery)
+  let heroVisible = true;
+  const heroEl = document.getElementById("home");
+  if (heroEl) new IntersectionObserver((e) => { heroVisible = e[0].isIntersecting; }).observe(heroEl);
+
   const clock = new THREE.Clock();
   const arr = geo.attributes.position.array;
   (function animate() {
-    requestAnimationFrame(animate);
+    if (!REDUCED_MOTION) requestAnimationFrame(animate);
+    if (!heroVisible) return;
     const t = clock.getElapsedTime();
     mx += (tmx - mx) * 0.09; my += (tmy - my) * 0.09;
     for (let i = 0; i < arr.length; i += 3) {
@@ -252,8 +261,8 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 
   const t0 = performance.now();
   (function draw(now) {
-    requestAnimationFrame(draw);
-    if (!visible) return;
+    if (!REDUCED_MOTION) requestAnimationFrame(draw);
+    if (!visible && !REDUCED_MOTION) return;
     const t = (now - t0) / 1000;
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = "rgba(14,14,16,0.14)";
@@ -435,8 +444,8 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 
   let last = performance.now(), acc = 0; const HOLD = 6200;
   (function loop(now) {
-    requestAnimationFrame(loop);
-    if (!visible) { last = now; return; }
+    if (!REDUCED_MOTION) requestAnimationFrame(loop);
+    if (!visible && !REDUCED_MOTION) { last = now; return; }
     acc += now - last; last = now;
     if (acc > HOLD) { acc = 0; scene = (scene + 1) % targets.length; apply(scene); }
     ctx.clearRect(0, 0, W, H);
@@ -446,7 +455,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const ts = now / 1000;
     for (let i = 0; i < N; i++) {
       const p = P[i];
-      const k = 0.034 + 0.022 * (0.5 + 0.5 * Math.sin(p.ph)); // per-particle pace (0.034–0.056)
+      const k = REDUCED_MOTION ? 1 : 0.034 + 0.022 * (0.5 + 0.5 * Math.sin(p.ph)); // per-particle pace
       p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k;
       const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
       const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
@@ -528,6 +537,11 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   let visible = true;
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(pipe);
 
+  if (REDUCED_MOTION) {
+    pipe.style.setProperty("--p", "1");
+    stages.forEach((s) => s.classList.add("active"));
+    return;
+  }
   const TRAVEL = 6000, HOLD = 1700, RESET = 700, CYCLE = TRAVEL + HOLD + RESET;
   const ease = (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   let t0 = performance.now();

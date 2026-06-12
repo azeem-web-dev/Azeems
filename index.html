@@ -5,10 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rayyan Azeem Syed — Portfolio</title>
   <meta name="description" content="Portfolio of Rayyan Azeem Syed — Co-Founder & CEO of HMGenX, Full-Stack & AI Developer. Builder of revenue-generating computer-vision products." />
+  <meta name="theme-color" content="#0b0b0d" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0b0d'/%3E%3Ctext x='32' y='44' font-family='Arial,sans-serif' font-size='36' font-weight='700' fill='%23ffffff' text-anchor='middle'%3EA%3C/text%3E%3C/svg%3E" />
+  <!-- social preview card -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Rayyan Azeem Syed — Full-Stack & AI Developer" />
+  <meta property="og:description" content="Co-Founder & CEO of HMGenX. I turn ideas into computer-vision products that real businesses pay for — OMR grading, YOLO plot detection, multilingual OCR." />
+  <meta property="og:image" content="assets/og-card.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Rayyan Azeem Syed — Full-Stack & AI Developer" />
+  <meta name="twitter:description" content="Co-Founder & CEO of HMGenX. Builder of revenue-generating computer-vision products." />
+  <meta name="twitter:image" content="assets/og-card.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="portfolio.css?v=19" />
+  <link rel="stylesheet" href="portfolio.css?v=20" />
 </head>
 <body>
 
@@ -27,8 +38,8 @@
 
   <!-- ============ HERO ============ -->
   <header class="hero" id="home">
-    <canvas id="deskscene"></canvas>
-    <canvas id="hero-particles"></canvas>
+    <canvas id="deskscene" aria-hidden="true"></canvas>
+    <canvas id="hero-particles" aria-hidden="true"></canvas>
     <div class="hero-overlay"></div>
     <div class="hero-inner">
       <div class="hero-left">
@@ -210,15 +221,15 @@
         <h2 class="title reveal">Real clients, <em>real results</em></h2>
         <div class="proof-grid">
           <a class="proof-card glass reveal" href="assets/cert-nakshatra.jpg" target="_blank" rel="noopener">
-            <div class="proof-img"><img src="assets/cert-nakshatra.jpg" alt="Certificate of Appreciation — Nakshatra IIT-JEE Academy" loading="lazy" /></div>
+            <div class="proof-img"><img src="assets/cert-nakshatra.jpg" alt="Certificate of Appreciation — Nakshatra IIT-JEE Academy" loading="lazy" decoding="async" /></div>
             <div class="proof-body"><h4>Certificate of Appreciation</h4><p>Nakshatra IIT-JEE Academy — OMR scanning application</p></div>
           </a>
           <a class="proof-card glass reveal" href="assets/cert-inlighnx.jpg" target="_blank" rel="noopener">
-            <div class="proof-img"><img src="assets/cert-inlighnx.jpg" alt="Internship Completion — InLighnX Global" loading="lazy" /></div>
+            <div class="proof-img"><img src="assets/cert-inlighnx.jpg" alt="Internship Completion — InLighnX Global" loading="lazy" decoding="async" /></div>
             <div class="proof-body"><h4>Front-end Internship</h4><p>InLighnX Global Pvt. Ltd. — completion certificate</p></div>
           </a>
           <a class="proof-card glass reveal" href="assets/cert-konic.jpg" target="_blank" rel="noopener">
-            <div class="proof-img"><img src="assets/cert-konic.jpg" alt="Internship Certificate — Konic Technologies" loading="lazy" /></div>
+            <div class="proof-img"><img src="assets/cert-konic.jpg" alt="Internship Certificate — Konic Technologies" loading="lazy" decoding="async" /></div>
             <div class="proof-body"><h4>Web Development Internship</h4><p>Konic Technologies — certificate of internship</p></div>
           </a>
         </div>
@@ -272,6 +283,7 @@
         <form class="contact-form reveal" action="https://formsubmit.co/ridahuda03@gmail.com" method="POST">
           <input type="hidden" name="_subject" value="New message from your portfolio" />
           <input type="hidden" name="_captcha" value="false" />
+          <input type="text" name="_honey" tabindex="-1" autocomplete="off" style="display:none" aria-hidden="true" />
           <input type="hidden" name="_template" value="table" />
           <div class="cf-row">
             <input type="text" name="name" placeholder="Your name" required />
@@ -310,6 +322,6 @@
   <script src="three.min.js"></script>
   <script src="gsap.min.js"></script>
   <script src="ScrollTrigger.min.js"></script>
-  <script src="portfolio.js?v=19"></script>
+  <script src="portfolio.js?v=20"></script>
 </body>
 </html>
