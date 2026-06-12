@@ -323,3 +323,126 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     setProgress(1); // no GSAP — show the journey complete
   }
 })();
+
+/* ===========================================================
+   Hero foreground — morphing icon particles (right side)
+   Tiny dots assemble into a silhouette, hold, then scatter and
+   reform into the next: programmer at desk → AI/robot → cloud → hacker.
+   Shapes are drawn with canvas primitives, then sampled to points.
+   =========================================================== */
+(function heroParticles() {
+  const canvas = document.getElementById("hero-particles");
+  const hero = document.getElementById("home");
+  if (!canvas || !hero) return;
+  const ctx = canvas.getContext("2d");
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0, box = 0, ox = 0, oy = 0;
+
+  const S = 300;
+  function rr(c, x, y, w, h, r) {
+    c.beginPath(); c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); c.fill();
+  }
+  // draw each icon into an offscreen canvas, then collect opaque pixels
+  function sample(draw) {
+    const oc = document.createElement("canvas"); oc.width = S; oc.height = S;
+    const c = oc.getContext("2d"); c.fillStyle = "#fff"; draw(c);
+    const d = c.getImageData(0, 0, S, S).data, pts = [];
+    for (let y = 0; y < S; y += 2)
+      for (let x = 0; x < S; x += 2)
+        if (d[(y * S + x) * 4 + 3] > 128) pts.push([x / S, y / S]);
+    return pts;
+  }
+
+  const icons = [
+    // 1 — programmer at a desk with a monitor (side view)
+    (c) => {
+      rr(c, 38, 206, 224, 12, 4);                         // desk
+      rr(c, 182, 116, 78, 72, 8); rr(c, 214, 188, 12, 14, 2); rr(c, 196, 200, 48, 8, 3); // monitor + stand
+      rr(c, 120, 197, 52, 8, 3);                          // keyboard
+      c.beginPath(); c.arc(92, 116, 24, 0, 7); c.fill();  // head
+      c.beginPath(); c.moveTo(60, 206); c.lineTo(124, 206); c.lineTo(116, 148); c.lineTo(68, 148); c.closePath(); c.fill(); // torso
+      rr(c, 108, 158, 64, 12, 6);                         // arm to keyboard
+    },
+    // 2 — AI / robot head
+    (c) => {
+      rr(c, 95, 96, 110, 110, 24);
+      rr(c, 146, 58, 8, 40, 4); c.beginPath(); c.arc(150, 53, 10, 0, 7); c.fill(); // antenna
+      rr(c, 77, 132, 16, 42, 4); rr(c, 207, 132, 16, 42, 4);                        // ears
+      c.globalCompositeOperation = "destination-out";
+      c.beginPath(); c.arc(128, 142, 13, 0, 7); c.fill();
+      c.beginPath(); c.arc(172, 142, 13, 0, 7); c.fill();
+      rr(c, 124, 174, 52, 10, 5);
+      c.globalCompositeOperation = "source-over";
+    },
+    // 3 — cloud
+    (c) => {
+      c.beginPath(); c.arc(108, 168, 38, 0, 7); c.fill();
+      c.beginPath(); c.arc(158, 146, 50, 0, 7); c.fill();
+      c.beginPath(); c.arc(206, 170, 40, 0, 7); c.fill();
+      rr(c, 92, 164, 132, 44, 22);
+    },
+    // 4 — hacker (hooded figure)
+    (c) => {
+      c.beginPath(); c.moveTo(68, 246); c.lineTo(232, 246); c.lineTo(206, 184); c.lineTo(94, 184); c.closePath(); c.fill(); // shoulders
+      c.beginPath(); c.ellipse(150, 126, 66, 74, 0, 0, 7); c.fill();   // hood
+      c.globalCompositeOperation = "destination-out";
+      c.beginPath(); c.ellipse(150, 136, 40, 50, 0, 0, 7); c.fill();   // face cutout
+      c.globalCompositeOperation = "source-over";
+      c.beginPath(); c.arc(135, 138, 5, 0, 7); c.fill();               // eye glints
+      c.beginPath(); c.arc(165, 138, 5, 0, 7); c.fill();
+    },
+  ];
+
+  const clouds = icons.map(sample);                 // full uniform grid per icon → crisp
+  const N = Math.max(...clouds.map((c) => c.length));
+  // every particle maps to a real grid cell; shorter icons wrap (dots overlap, unseen)
+  const targets = clouds.map((pts) => Array.from({ length: N }, (_, i) => pts[i % pts.length]));
+
+  const P = Array.from({ length: N }, () => ({
+    x: Math.random(), y: Math.random(), tx: 0.5, ty: 0.5, ph: Math.random() * 6.28,
+  }));
+  let scene = 0;
+  const apply = (k) => P.forEach((p, i) => { p.tx = targets[k][i][0]; p.ty = targets[k][i][1]; });
+  apply(0);
+
+  function resize() {
+    W = hero.clientWidth; H = hero.clientHeight;
+    canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    box = Math.min(W * 0.34, H * 0.52, 390); ox = W * 0.72 - box / 2; oy = H * 0.47 - box / 2;
+  }
+  window.addEventListener("resize", resize); resize();
+
+  let visible = true;
+  new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(hero);
+
+  let last = performance.now(), acc = 0; const HOLD = 2900;
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    if (!visible) { last = now; return; }
+    acc += now - last; last = now;
+    if (acc > HOLD) { acc = 0; scene = (scene + 1) % targets.length; apply(scene); }
+    ctx.clearRect(0, 0, W, H);
+
+    // dark stage hides the busy wave behind the icon so the silhouette reads
+    const cx = ox + box / 2, cy = oy + box / 2, rad = box * 0.92;
+    const g = ctx.createRadialGradient(cx, cy, rad * 0.2, cx, cy, rad);
+    g.addColorStop(0, "rgba(6,6,9,0.94)"); g.addColorStop(0.62, "rgba(6,6,9,0.85)"); g.addColorStop(1, "rgba(6,6,9,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.fill();
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = "rgba(236,242,255,0.92)";
+    const ts = now / 1000;
+    for (let i = 0; i < N; i++) {
+      const p = P[i];
+      p.x += (p.tx - p.x) * 0.1; p.y += (p.ty - p.y) * 0.1;
+      const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
+      const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
+      // dense dots blend under 'lighter' into a solid, softly glowing silhouette
+      ctx.beginPath(); ctx.arc(px, py, 1.5, 0, 7); ctx.fill();
+    }
+    ctx.globalCompositeOperation = "source-over";
+  })(last);
+})();
