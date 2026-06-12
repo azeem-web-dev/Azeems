@@ -426,7 +426,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   function resize() {
     W = hero.clientWidth; H = hero.clientHeight;
     canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    box = Math.min(W * 0.42, H * 0.64, 500); ox = W * 0.76 - box / 2; oy = H * 0.46 - box / 2;
+    box = Math.min(W * 0.42, H * 0.64, W >= 2200 ? 760 : W >= 1600 ? 640 : 500); ox = W * 0.76 - box / 2; oy = H * 0.46 - box / 2;
   }
   window.addEventListener("resize", resize); resize();
 
