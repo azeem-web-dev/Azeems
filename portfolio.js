@@ -426,14 +426,14 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   function resize() {
     W = hero.clientWidth; H = hero.clientHeight;
     canvas.width = W * DPR; canvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    box = Math.min(W * 0.38, H * 0.58, 440); ox = W * 0.72 - box / 2; oy = H * 0.47 - box / 2;
+    box = Math.min(W * 0.42, H * 0.64, 500); ox = W * 0.76 - box / 2; oy = H * 0.46 - box / 2;
   }
   window.addEventListener("resize", resize); resize();
 
   let visible = true;
   new IntersectionObserver((e) => { visible = e[0].isIntersecting; }).observe(hero);
 
-  let last = performance.now(), acc = 0; const HOLD = 2900;
+  let last = performance.now(), acc = 0; const HOLD = 6200;
   (function loop(now) {
     requestAnimationFrame(loop);
     if (!visible) { last = now; return; }
@@ -446,7 +446,8 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const ts = now / 1000;
     for (let i = 0; i < N; i++) {
       const p = P[i];
-      p.x += (p.tx - p.x) * 0.1; p.y += (p.ty - p.y) * 0.1;
+      const k = 0.034 + 0.022 * (0.5 + 0.5 * Math.sin(p.ph)); // per-particle pace (0.034–0.056)
+      p.x += (p.tx - p.x) * k; p.y += (p.ty - p.y) * k;
       const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
       const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
       ctx.beginPath(); ctx.arc(px, py, 1.15, 0, 7); ctx.fill();
