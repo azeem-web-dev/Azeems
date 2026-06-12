@@ -371,41 +371,43 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       rr(c, 46, 116, 10, 78, 4);                                  // chair backrest
       rr(c, 50, 190, 62, 10, 4); rr(c, 76, 200, 8, 32, 2); rr(c, 58, 232, 46, 8, 4); // seat, post, base
     },
-    // 2 — AI brain with circuit lines + nodes
+    // 2 — AI brain: wide outline, internal neural net, external traces
     (c) => {
-      [[110,128,30],[136,108,34],[166,104,34],[194,124,30],[206,150,26],[120,154,30],[150,150,36],[182,154,30],[150,124,34]]
-        .forEach(([x,y,r]) => { c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }); // bumpy brain
-      c.globalCompositeOperation = "destination-out"; c.lineWidth = 5;
-      c.beginPath(); c.moveTo(150,86); c.lineTo(150,184); c.stroke();              // central fissure
-      c.beginPath(); c.moveTo(120,116); c.quadraticCurveTo(140,134,120,154); c.stroke();
-      c.beginPath(); c.moveTo(180,116); c.quadraticCurveTo(160,134,180,154); c.stroke();
-      c.globalCompositeOperation = "source-over"; c.lineWidth = 5;
-      [[150,86,150,50],[110,128,64,108],[206,148,244,140],[120,180,98,224],[182,180,206,224]]
-        .forEach(([a,b,x,y]) => { c.beginPath(); c.moveTo(a,b); c.lineTo(x,y); c.stroke(); c.beginPath(); c.arc(x,y,8,0,7); c.fill(); }); // traces + nodes
+      const BUMPS = [[96,128,30],[126,102,34],[162,98,34],[198,118,30],[214,146,26],[104,158,30],[150,154,36],[192,158,30],[152,124,34]];
+      const bumps = (s, cx, cy) => BUMPS.forEach(([x,y,r]) => { c.beginPath(); c.arc(cx+(x-cx)*s, cy+(y-cy)*s, r*s, 0, 7); c.fill(); });
+      bumps(1, 155, 130);                                          // brain silhouette
+      c.globalCompositeOperation = "destination-out"; bumps(0.74, 155, 132); // hollow → outline
+      c.globalCompositeOperation = "source-over";
+      const n = [[124,116],[156,104],[188,118],[116,150],[150,138],[186,152],[136,172],[168,174]];
+      c.lineWidth = 3.5;                                           // internal neural connections
+      [[0,1],[1,2],[0,4],[1,4],[2,5],[3,4],[4,5],[3,6],[4,6],[4,7],[5,7],[6,7]]
+        .forEach(([a,b]) => { c.beginPath(); c.moveTo(n[a][0],n[a][1]); c.lineTo(n[b][0],n[b][1]); c.stroke(); });
+      n.forEach(([x,y]) => { c.beginPath(); c.arc(x, y, 5.5, 0, 7); c.fill(); });
+      c.lineWidth = 5;                                             // external traces + nodes
+      [[156,80,156,46],[96,128,52,108],[216,146,254,138],[112,178,88,222],[194,180,218,224]]
+        .forEach(([a,b,x,y]) => { c.beginPath(); c.moveTo(a,b); c.lineTo(x,y); c.stroke(); c.beginPath(); c.arc(x,y,7,0,7); c.fill(); });
     },
-    // 3 — cloud
+    // 3 — cloud (outline only)
     (c) => {
-      c.beginPath(); c.arc(108, 168, 38, 0, 7); c.fill();
-      c.beginPath(); c.arc(158, 146, 50, 0, 7); c.fill();
-      c.beginPath(); c.arc(206, 170, 40, 0, 7); c.fill();
-      rr(c, 92, 164, 132, 44, 22);
-    },
-    // 4 — Python logo (two interlocking snakes)
-    (c) => {
-      rr(c, 95, 58, 56, 90, 26); rr(c, 95, 104, 120, 44, 22);    // top snake: left bar + right arm
-      rr(c, 149, 152, 56, 90, 26); rr(c, 85, 152, 120, 44, 22);  // bottom snake: right bar + left arm
-      c.globalCompositeOperation = "destination-out";
-      c.beginPath(); c.arc(119, 80, 6, 0, 7); c.fill();           // top eye
-      c.beginPath(); c.arc(181, 220, 6, 0, 7); c.fill();          // bottom eye
+      const cloud = (s, cx, cy) => {
+        c.beginPath(); c.arc(cx+(108-cx)*s, cy+(168-cy)*s, 38*s, 0, 7); c.fill();
+        c.beginPath(); c.arc(cx+(158-cx)*s, cy+(146-cy)*s, 50*s, 0, 7); c.fill();
+        c.beginPath(); c.arc(cx+(206-cx)*s, cy+(170-cy)*s, 40*s, 0, 7); c.fill();
+        rr(c, cx+(92-cx)*s, cy+(164-cy)*s, 132*s, 44*s, 22*s);
+      };
+      cloud(1, 157, 172);
+      c.globalCompositeOperation = "destination-out"; cloud(0.72, 157, 174); // hollow → outline
       c.globalCompositeOperation = "source-over";
     },
-    // 5 — git / network graph (nodes + connecting lines)
+    // 4 — CPU chip
     (c) => {
-      c.lineWidth = 6;
-      const n = [[64,70],[64,150],[64,230],[140,110],[140,200],[214,66],[214,150],[214,232]];
-      [[0,1],[1,2],[1,3],[3,4],[0,5],[5,6],[6,7],[3,6],[4,7]]
-        .forEach(([a,b]) => { c.beginPath(); c.moveTo(n[a][0],n[a][1]); c.lineTo(n[b][0],n[b][1]); c.stroke(); });
-      n.forEach(([x,y]) => { c.beginPath(); c.arc(x, y, 12, 0, 7); c.fill(); });
+      rr(c, 96, 96, 108, 108, 10);                                 // body
+      for (let i = 0; i < 4; i++) { const o = 112 + i * 26;        // pins ×4 per side
+        rr(c, o, 66, 9, 26, 3); rr(c, o, 208, 9, 26, 3); rr(c, 66, o, 26, 9, 3); rr(c, 208, o, 26, 9, 3); }
+      c.globalCompositeOperation = "destination-out";
+      rr(c, 122, 122, 56, 56, 7);                                  // hollow frame
+      c.globalCompositeOperation = "source-over";
+      c.beginPath(); c.arc(150, 150, 11, 0, 7); c.fill();          // core
     },
   ];
 
@@ -439,23 +441,15 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     if (acc > HOLD) { acc = 0; scene = (scene + 1) % targets.length; apply(scene); }
     ctx.clearRect(0, 0, W, H);
 
-    // clean flat-black backing (feathered edge, no visible gradient) so the icon
-    // reads against the busy wave without an obvious darkened blob
-    const cx = ox + box / 2, cy = oy + box / 2, rad = box * 0.96;
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
-    g.addColorStop(0, "rgba(7,7,10,0.98)"); g.addColorStop(0.74, "rgba(7,7,10,0.97)"); g.addColorStop(1, "rgba(7,7,10,0)");
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.fill();
-
     ctx.globalCompositeOperation = "lighter";
-    ctx.fillStyle = "rgba(236,242,255,0.95)";
+    ctx.fillStyle = "rgba(240,245,255,0.95)";
     const ts = now / 1000;
     for (let i = 0; i < N; i++) {
       const p = P[i];
       p.x += (p.tx - p.x) * 0.1; p.y += (p.ty - p.y) * 0.1;
       const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
       const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
-      ctx.beginPath(); ctx.arc(px, py, 0.8, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, 1.15, 0, 7); ctx.fill();
     }
     ctx.globalCompositeOperation = "source-over";
   })(last);
