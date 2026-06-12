@@ -206,7 +206,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const arr = geo.attributes.position.array;
   (function animate() {
     requestAnimationFrame(animate);
-    const t = clock.elapsedTime;
+    const t = clock.getElapsedTime();
     mx += (tmx - mx) * 0.09; my += (tmy - my) * 0.09;
     for (let i = 0; i < arr.length; i += 3) {
       const x = base[i], z = base[i + 2];
