@@ -550,3 +550,77 @@ em { font-style: normal; }
   .pl-node { margin-bottom: 0; flex: 0 0 auto; width: 60px; height: 60px; }
   .pl-body p { max-width: none; }
 }
+
+/* ===========================================================
+   The foundation — education as a ziggurat under construction:
+   slabs drop and settle bottom-up, then a flag is planted on top
+   =========================================================== */
+.foundation { display: flex; flex-direction: column; align-items: center; }
+.fd-slab {
+  display: grid; grid-template-columns: 64px 1fr auto; align-items: center; gap: 18px;
+  background: rgba(255, 255, 255, 0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(14, 14, 16, 0.14); border-radius: 10px;
+  padding: 20px 28px; box-shadow: 0 14px 34px rgba(14, 14, 16, 0.07);
+  opacity: 0; transform: translateY(-70px);
+}
+.fd-top  { width: min(58%, 560px); z-index: 3; }
+.fd-mid  { width: min(76%, 730px); z-index: 2; margin-top: -1px; }
+.fd-base { width: min(94%, 900px); z-index: 1; margin-top: -1px; }
+.fd-ground { width: 100%; height: 4px; background: var(--ink); border-radius: 2px; margin-top: -1px;
+  transform: scaleX(0); transition: transform 0.7s cubic-bezier(.22,.61,.36,1); }
+
+.fd-year { font-family: var(--mono); font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink); border: 1px solid rgba(14,14,16,0.25); border-radius: 999px; padding: 4px 0; text-align: center; }
+.fd-info h4 { font-family: var(--disp); font-size: 19px; font-weight: 600; line-height: 1.2; }
+.fd-info p { font-size: 13.5px; font-weight: 300; color: var(--ink-soft); margin-top: 2px; }
+.fd-score { font-family: var(--disp); font-size: 34px; font-weight: 700; letter-spacing: -1px; line-height: 1; }
+.fd-score i { font-style: normal; font-family: var(--mono); font-size: 11px; font-weight: 400;
+  letter-spacing: 1px; color: var(--ink-soft); margin-left: 5px; }
+
+.fd-flag { position: relative; height: 56px; width: 2px; background: var(--ink); margin-bottom: -1px;
+  transform-origin: bottom center; transform: scaleY(0); transition: transform 0.45s cubic-bezier(.34,1.56,.64,1); }
+.fd-flag span { position: absolute; top: 0; left: 2px; background: var(--ink); color: #fff;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 1.5px; padding: 4px 10px 4px 8px;
+  clip-path: polygon(0 0, 100% 0, 86% 50%, 100% 100%, 0 100%); white-space: nowrap; }
+
+/* construction sequence (slabs settle with a slight bounce, bottom-up) */
+.foundation.built .fd-slab { opacity: 1; transform: none; transition: transform 0.65s cubic-bezier(.2,1.35,.45,1), opacity 0.4s ease; }
+.foundation.built .fd-ground { transform: scaleX(1); }
+.foundation.built .fd-base { transition-delay: 0.10s; }
+.foundation.built .fd-mid  { transition-delay: 0.48s; }
+.foundation.built .fd-top  { transition-delay: 0.86s; }
+.foundation.built .fd-flag { transform: scaleY(1); transition-delay: 1.35s; }
+
+.fd-slab:hover { border-color: var(--ink); }
+
+.fd-honours { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px 14px; margin-top: 44px; }
+.fd-honours li {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--mono); font-size: 12px; letter-spacing: 0.2px; color: var(--ink-2);
+  background: #fff; border: 1px solid rgba(14,14,16,0.14); border-radius: 999px; padding: 9px 18px;
+  opacity: 0; transform: translateY(14px) scale(0.95);
+  box-shadow: 0 8px 20px rgba(14,14,16,0.06);
+  transition: transform 0.5s cubic-bezier(.2,1.35,.45,1), opacity 0.4s ease, background 0.3s ease, color 0.3s ease;
+}
+.fd-honours li svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.fd-honours li:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.foundation.built .fd-honours li { opacity: 1; transform: none; }
+.foundation.built .fd-honours li:nth-child(1) { transition-delay: 1.55s; }
+.foundation.built .fd-honours li:nth-child(2) { transition-delay: 1.67s; }
+.foundation.built .fd-honours li:nth-child(3) { transition-delay: 1.79s; }
+.foundation.built .fd-honours li:nth-child(4) { transition-delay: 1.91s; }
+
+@media (min-width: 1600px) {
+  .fd-info h4 { font-size: 22px; }
+  .fd-info p { font-size: 15px; }
+  .fd-score { font-size: 40px; }
+  .fd-slab { padding: 26px 34px; }
+  .fd-top { max-width: 660px; } .fd-mid { max-width: 850px; } .fd-base { max-width: 1040px; }
+  .fd-honours li { font-size: 13px; padding: 10px 20px; }
+}
+@media (max-width: 700px) {
+  .fd-top, .fd-mid, .fd-base { width: 100%; }
+  .fd-slab { grid-template-columns: 1fr auto; padding: 18px 20px; }
+  .fd-year { display: none; }
+  .fd-score { font-size: 26px; }
+}

@@ -544,3 +544,16 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     stages.forEach((s, i) => s.classList.toggle("active", lit && p >= nps[i] - 0.0001));
   })(t0);
 })();
+
+/* ===========================================================
+   The foundation — start the construction when it scrolls in
+   =========================================================== */
+(function foundationBuild() {
+  const fd = document.getElementById("foundation");
+  if (!fd) return;
+  new IntersectionObserver((entries, io) => {
+    if (!entries[0].isIntersecting) return;
+    fd.classList.add("built");
+    io.disconnect();
+  }, { threshold: 0.35 }).observe(fd);
+})();
