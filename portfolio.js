@@ -347,7 +347,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   // draw each icon into an offscreen canvas, then collect opaque pixels
   function sample(draw) {
     const oc = document.createElement("canvas"); oc.width = S; oc.height = S;
-    const c = oc.getContext("2d"); c.fillStyle = "#fff"; c.strokeStyle = "#fff"; c.lineCap = "round"; draw(c);
+    const c = oc.getContext("2d"); c.fillStyle = "#fff"; c.strokeStyle = "#fff"; c.lineCap = "round"; c.lineJoin = "round"; draw(c);
     const d = c.getImageData(0, 0, S, S).data, pts = [];
     for (let y = 0; y < S; y += 2)
       for (let x = 0; x < S; x += 2)
@@ -371,16 +371,17 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       rr(c, 46, 116, 10, 78, 4);                                  // chair backrest
       rr(c, 50, 190, 62, 10, 4); rr(c, 76, 200, 8, 32, 2); rr(c, 58, 232, 46, 8, 4); // seat, post, base
     },
-    // 2 — AI / robot head
+    // 2 — AI brain with circuit lines + nodes
     (c) => {
-      rr(c, 95, 96, 110, 110, 24);
-      rr(c, 146, 58, 8, 40, 4); c.beginPath(); c.arc(150, 53, 10, 0, 7); c.fill(); // antenna
-      rr(c, 77, 132, 16, 42, 4); rr(c, 207, 132, 16, 42, 4);                        // ears
-      c.globalCompositeOperation = "destination-out";
-      c.beginPath(); c.arc(128, 142, 13, 0, 7); c.fill();
-      c.beginPath(); c.arc(172, 142, 13, 0, 7); c.fill();
-      rr(c, 124, 174, 52, 10, 5);
-      c.globalCompositeOperation = "source-over";
+      [[110,128,30],[136,108,34],[166,104,34],[194,124,30],[206,150,26],[120,154,30],[150,150,36],[182,154,30],[150,124,34]]
+        .forEach(([x,y,r]) => { c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }); // bumpy brain
+      c.globalCompositeOperation = "destination-out"; c.lineWidth = 5;
+      c.beginPath(); c.moveTo(150,86); c.lineTo(150,184); c.stroke();              // central fissure
+      c.beginPath(); c.moveTo(120,116); c.quadraticCurveTo(140,134,120,154); c.stroke();
+      c.beginPath(); c.moveTo(180,116); c.quadraticCurveTo(160,134,180,154); c.stroke();
+      c.globalCompositeOperation = "source-over"; c.lineWidth = 5;
+      [[150,86,150,50],[110,128,64,108],[206,148,244,140],[120,180,98,224],[182,180,206,224]]
+        .forEach(([a,b,x,y]) => { c.beginPath(); c.moveTo(a,b); c.lineTo(x,y); c.stroke(); c.beginPath(); c.arc(x,y,8,0,7); c.fill(); }); // traces + nodes
     },
     // 3 — cloud
     (c) => {
@@ -389,20 +390,22 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
       c.beginPath(); c.arc(206, 170, 40, 0, 7); c.fill();
       rr(c, 92, 164, 132, 44, 22);
     },
-    // 4 — Kali-style dragon (stylized swirl)
+    // 4 — Python logo (two interlocking snakes)
     (c) => {
-      c.lineWidth = 26; c.beginPath(); c.moveTo(42, 108);
-      c.quadraticCurveTo(110, 52, 176, 82); c.quadraticCurveTo(232, 106, 238, 156); c.stroke(); // snout→neck→back
-      c.lineWidth = 18; c.beginPath(); c.moveTo(238, 156);
-      c.quadraticCurveTo(242, 212, 188, 220); c.quadraticCurveTo(140, 226, 148, 184); c.stroke(); // tail swirl
-      c.lineWidth = 11; c.beginPath(); c.moveTo(148, 184);
-      c.quadraticCurveTo(154, 162, 180, 168); c.stroke();              // inner curl
-      c.lineWidth = 9; c.beginPath(); c.moveTo(44, 120); c.quadraticCurveTo(80, 136, 116, 126); c.stroke(); // lower jaw
-      c.beginPath(); c.moveTo(120, 58); c.lineTo(136, 30); c.lineTo(150, 64); c.closePath(); c.fill(); // spike 1
-      c.beginPath(); c.moveTo(158, 60); c.lineTo(180, 40); c.lineTo(186, 74); c.closePath(); c.fill(); // spike 2
+      rr(c, 95, 58, 56, 90, 26); rr(c, 95, 104, 120, 44, 22);    // top snake: left bar + right arm
+      rr(c, 149, 152, 56, 90, 26); rr(c, 85, 152, 120, 44, 22);  // bottom snake: right bar + left arm
       c.globalCompositeOperation = "destination-out";
-      c.beginPath(); c.arc(102, 80, 7, 0, 7); c.fill();                // eye
+      c.beginPath(); c.arc(119, 80, 6, 0, 7); c.fill();           // top eye
+      c.beginPath(); c.arc(181, 220, 6, 0, 7); c.fill();          // bottom eye
       c.globalCompositeOperation = "source-over";
+    },
+    // 5 — git / network graph (nodes + connecting lines)
+    (c) => {
+      c.lineWidth = 6;
+      const n = [[64,70],[64,150],[64,230],[140,110],[140,200],[214,66],[214,150],[214,232]];
+      [[0,1],[1,2],[1,3],[3,4],[0,5],[5,6],[6,7],[3,6],[4,7]]
+        .forEach(([a,b]) => { c.beginPath(); c.moveTo(n[a][0],n[a][1]); c.lineTo(n[b][0],n[b][1]); c.stroke(); });
+      n.forEach(([x,y]) => { c.beginPath(); c.arc(x, y, 12, 0, 7); c.fill(); });
     },
   ];
 
@@ -436,23 +439,23 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     if (acc > HOLD) { acc = 0; scene = (scene + 1) % targets.length; apply(scene); }
     ctx.clearRect(0, 0, W, H);
 
-    // dark stage hides the busy wave behind the icon so the silhouette reads
-    const cx = ox + box / 2, cy = oy + box / 2, rad = box * 0.92;
-    const g = ctx.createRadialGradient(cx, cy, rad * 0.2, cx, cy, rad);
-    g.addColorStop(0, "rgba(6,6,9,0.94)"); g.addColorStop(0.62, "rgba(6,6,9,0.85)"); g.addColorStop(1, "rgba(6,6,9,0)");
+    // clean flat-black backing (feathered edge, no visible gradient) so the icon
+    // reads against the busy wave without an obvious darkened blob
+    const cx = ox + box / 2, cy = oy + box / 2, rad = box * 0.96;
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    g.addColorStop(0, "rgba(7,7,10,0.98)"); g.addColorStop(0.74, "rgba(7,7,10,0.97)"); g.addColorStop(1, "rgba(7,7,10,0)");
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(cx, cy, rad, 0, 7); ctx.fill();
 
     ctx.globalCompositeOperation = "lighter";
-    ctx.fillStyle = "rgba(236,242,255,0.92)";
+    ctx.fillStyle = "rgba(236,242,255,0.95)";
     const ts = now / 1000;
     for (let i = 0; i < N; i++) {
       const p = P[i];
       p.x += (p.tx - p.x) * 0.1; p.y += (p.ty - p.y) * 0.1;
       const jx = Math.sin(ts * 1.1 + p.ph) * 0.0004, jy = Math.cos(ts * 0.9 + p.ph) * 0.0004;
       const px = ox + (p.x + jx) * box, py = oy + (p.y + jy) * box;
-      // dense dots blend under 'lighter' into a solid, softly glowing silhouette
-      ctx.beginPath(); ctx.arc(px, py, 1.1, 0, 7); ctx.fill();
+      ctx.beginPath(); ctx.arc(px, py, 0.8, 0, 7); ctx.fill();
     }
     ctx.globalCompositeOperation = "source-over";
   })(last);
