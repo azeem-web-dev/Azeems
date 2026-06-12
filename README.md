@@ -3,7 +3,7 @@
 Personal portfolio website and resume for **Rayyan Azeem Syed** — Co-Founder & CEO of HMGenX,
 Full-Stack & AI Developer.
 
-🔗 **Live (after enabling GitHub Pages):** `https://azeem-web-dev.github.io/azeems/`
+🔗 **Live (after enabling GitHub Pages):** `https://azeem.highflyers.io/`
 
 ## Contents
 

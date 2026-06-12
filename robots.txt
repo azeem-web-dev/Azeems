@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://azeem-web-dev.github.io/azeems/sitemap.xml
+Sitemap: https://azeem.highflyers.io/sitemap.xml
