@@ -571,3 +571,106 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     io.disconnect();
   }, { threshold: 0.35 }).observe(fd);
 })();
+
+/* ===========================================================
+   AI assistant — chat widget (streams from the Worker proxy)
+   The API key lives only in the Worker; the browser never sees it.
+   =========================================================== */
+(function aiAssistant() {
+  const fab = document.getElementById("chat-fab");
+  const panel = document.getElementById("chat-panel");
+  const log = document.getElementById("chat-log");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("chat-text");
+  const suggest = document.getElementById("chat-suggest");
+  if (!fab || !panel || !form) return;
+
+  const endpoint = (window.AZEEM_CHAT_ENDPOINT || "").trim();
+  const history = [];
+  let busy = false, greeted = false;
+
+  function toggle(open) {
+    const show = open ?? !panel.classList.contains("open");
+    panel.classList.toggle("open", show);
+    fab.classList.toggle("open", show);
+    panel.setAttribute("aria-hidden", show ? "false" : "true");
+    if (show) {
+      input.focus();
+      if (!greeted) { greeted = true; addMsg("bot", "Hi! I'm Rayyan's AI assistant. Ask me about his projects, skills, or whether he's available to hire."); }
+    }
+  }
+  fab.addEventListener("click", () => toggle());
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("open")) toggle(false); });
+
+  function addMsg(role, text) {
+    const el = document.createElement("div");
+    el.className = "chat-msg " + (role === "user" ? "user" : "bot");
+    el.textContent = text;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+  function typingBubble() {
+    const el = document.createElement("div");
+    el.className = "chat-msg bot typing";
+    el.innerHTML = "<i></i><i></i><i></i>";
+    log.appendChild(el); log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  suggest.querySelectorAll("button").forEach((b) =>
+    b.addEventListener("click", () => { input.value = b.textContent; form.requestSubmit(); }));
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text || busy) return;
+    busy = true; input.value = ""; suggest.style.display = "none";
+    addMsg("user", text);
+    history.push({ role: "user", content: text });
+
+    const bubble = typingBubble();
+
+    if (!endpoint) {
+      bubble.classList.remove("typing");
+      bubble.textContent = "The assistant isn't connected yet — add the Worker URL in index.html (see CHATBOT-SETUP.md). Meanwhile, reach Rayyan at ridahuda03@gmail.com.";
+      busy = false; return;
+    }
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history }),
+      });
+      if (!res.ok || !res.body) throw new Error("bad response");
+
+      bubble.classList.remove("typing"); bubble.textContent = "";
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "", full = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        const lines = buf.split("\n"); buf = lines.pop();
+        for (const line of lines) {
+          const s = line.trim();
+          if (!s.startsWith("data:")) continue;
+          const data = s.slice(5).trim();
+          if (data === "[DONE]" || !data) continue;
+          try {
+            const piece = JSON.parse(data).choices?.[0]?.delta?.content;
+            if (piece) { full += piece; bubble.textContent = full; log.scrollTop = log.scrollHeight; }
+          } catch { /* ignore keep-alive lines */ }
+        }
+      }
+      if (!full) bubble.textContent = "Sorry, I didn't catch that — could you rephrase?";
+      history.push({ role: "assistant", content: full });
+    } catch (err) {
+      bubble.classList.remove("typing");
+      bubble.textContent = "Sorry — I couldn't reach the assistant right now. You can email Rayyan at ridahuda03@gmail.com.";
+    } finally {
+      busy = false;
+    }
+  });
+})();
