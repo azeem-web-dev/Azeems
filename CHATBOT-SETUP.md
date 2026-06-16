@@ -1,31 +1,37 @@
-# AI Assistant — setup (5 minutes)
+# AI Assistant — setup (Hostinger PHP, ~3 minutes)
 
-The chat widget on the site talks to a tiny **Cloudflare Worker** that holds your
-NVIDIA API key as a secret. The key is **never** in the website code.
+The chat widget calls **`/chat.php`** on your own domain. That PHP file holds your
+NVIDIA key — but the key is **never** committed to GitHub. It's read from a
+`secrets.php` file that is gitignored (or from an environment variable).
 
 ## 1. Rotate your key first
-Your previous key was shared in plain text — revoke it at https://build.nvidia.com
-and create a fresh one. Use the new key below.
+The key you shared earlier is compromised — revoke it at https://build.nvidia.com
+and create a fresh one.
 
-## 2. Deploy the Worker
-1. Go to https://dash.cloudflare.com → **Workers & Pages** → **Create** → **Create Worker**.
-2. Name it e.g. `azeem-assistant`, click **Deploy**, then **Edit code**.
-3. Replace the contents with the code from `chatbot-worker.js` in this repo. **Save & Deploy**.
-4. **Settings → Variables and Secrets → Add** a secret:
-   - Name: `NVIDIA_API_KEY`
-   - Value: *(your new NVIDIA key)*
-   - Click **Encrypt** / Save, then **Deploy** again.
-5. Copy the Worker URL (looks like `https://azeem-assistant.<you>.workers.dev`).
+## 2. Create secrets.php on the server (one time)
+Because `secrets.php` is gitignored, auto-deploy will never overwrite or expose it.
+Create it once on Hostinger:
 
-## 3. Point the site at the Worker
-In `index.html`, set:
-```html
-<script>window.AZEEM_CHAT_ENDPOINT = "https://azeem-assistant.<you>.workers.dev";</script>
-```
-Commit & push. Done — open the site, click the chat bubble, ask a question.
+1. Hostinger **hPanel → Files → File Manager** → open your site's web root
+   (where `index.html` / `chat.php` live).
+2. Create a new file named **`secrets.php`** with exactly:
+   ```php
+   <?php
+   return 'nvapi-YOUR-NEW-KEY-HERE';
+   ```
+3. Save. Done — `chat.php` will pick it up automatically.
+
+> Prefer env vars? In hPanel you can instead set an environment variable
+> `NVIDIA_API_KEY`; `chat.php` checks that first. The secrets.php file is the
+> simplest reliable option on shared hosting.
+
+## 3. Deploy
+Your normal PHP auto-deploy to Hostinger ships `chat.php`. The widget is already
+wired to `/chat.php` in `index.html`. Open the site, click the chat bubble, ask away.
 
 ## Notes
-- Model is set in `chatbot-worker.js` (`MODEL`). Change it to any NVIDIA model id you like.
-- Cost guardrails are built in: max 700 output tokens, last 12 turns only, input capped.
-- To lock it to your domain, change `Access-Control-Allow-Origin: "*"` in the Worker to
-  `"https://azeem.highflyers.io"`.
+- Model is set at the top of `chat.php` (`$MODEL`).
+- Cost guardrails: 700 max output tokens, last 12 turns only, input capped at 1500 chars.
+- Same-origin, so no CORS needed. If you ever host the widget on a different domain,
+  add `header('Access-Control-Allow-Origin: https://azeem.highflyers.io');` to chat.php.
+- Requires PHP cURL (enabled by default on Hostinger).

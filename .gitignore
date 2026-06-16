@@ -3,3 +3,6 @@ node_modules/
 .DS_Store
 resume_preview.png
 a4_check.png
+
+# AI assistant API key (never commit)
+secrets.php
