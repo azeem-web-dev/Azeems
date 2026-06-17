@@ -16,7 +16,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
   exit;
 }
 
-$MODEL = 'nvidia/nemotron-3-super-120b-a12b'; // change to any NVIDIA model id
+$MODEL = 'z-ai/glm-5.1'; // change to any NVIDIA model id
 
 $SYSTEM = <<<'TXT'
 You are "Azeem's Assistant", a friendly, concise AI on the portfolio website of Rayyan
@@ -88,7 +88,6 @@ $payload = [
   'top_p'       => 0.95,
   'max_tokens'  => 700,
   'stream'      => true,
-  'chat_template_kwargs' => ['enable_thinking' => false],
 ];
 
 // --- stream NVIDIA's SSE straight back to the browser ---
