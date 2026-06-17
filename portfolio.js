@@ -583,11 +583,13 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const form = document.getElementById("chat-form");
   const input = document.getElementById("chat-text");
   const suggest = document.getElementById("chat-suggest");
+  const closeX = document.getElementById("chat-x");
+  const tip = document.getElementById("chat-tip");
   if (!fab || !panel || !form) return;
 
   const endpoint = (window.AZEEM_CHAT_ENDPOINT || "").trim();
   const history = [];
-  let busy = false, greeted = false;
+  let busy = false, greeted = false, tipDone = false;
 
   function toggle(open) {
     const show = open ?? !panel.classList.contains("open");
@@ -595,9 +597,18 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     fab.classList.toggle("open", show);
     panel.setAttribute("aria-hidden", show ? "false" : "true");
     if (show) {
+      tipDone = true; if (tip) tip.classList.remove("show");
       input.focus();
       if (!greeted) { greeted = true; addMsg("bot", "Hi! I'm Rayyan's AI assistant. Ask me about his projects, skills, or whether he's available to hire."); }
     }
+  }
+  if (closeX) closeX.addEventListener("click", () => toggle(false));
+
+  // gently pop the "Ask me anything" nudge out, then tuck it away
+  if (tip && !REDUCED_MOTION) {
+    setTimeout(() => { if (!tipDone && !panel.classList.contains("open")) tip.classList.add("show"); }, 3500);
+    setTimeout(() => tip.classList.remove("show"), 9500);
+    fab.addEventListener("mouseenter", () => { tipDone = true; tip.classList.remove("show"); });
   }
   fab.addEventListener("click", () => toggle());
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("open")) toggle(false); });
