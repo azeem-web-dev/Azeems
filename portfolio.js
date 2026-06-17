@@ -718,6 +718,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 
   function done() {
     cancelAnimationFrame(meshRAF);
+    if (vanta) { try { vanta.destroy(); } catch (e) {} vanta = null; }
     intro.style.display = "none";
     document.body.style.overflow = "";
     intro.remove();
@@ -759,39 +760,18 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     setTimeout(morph, 1500);
   }
 
-  // animated network mesh behind the intro
+  // animated 3D background via Vanta.js (WAVES) — falls back to the dark stage
+  let vanta = null;
   function startMesh() {
-    if (!meshCanvas) return;
-    const ctx = meshCanvas.getContext("2d");
-    const DPR = Math.min(window.devicePixelRatio || 1, 2);
-    let W, H;
-    const N = Math.max(34, Math.min(74, Math.round(window.innerWidth / 22)));
-    const pts = Array.from({ length: N }, () => ({
-      x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.38, vy: (Math.random() - 0.5) * 0.38,
-    }));
-    function size() { W = window.innerWidth; H = window.innerHeight; meshCanvas.width = W * DPR; meshCanvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
-    size(); window.addEventListener("resize", size);
-    const D = 160;
-    (function frame() {
-      meshRAF = requestAnimationFrame(frame);
-      ctx.clearRect(0, 0, W, H);
-      for (const p of pts) {
-        p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > W) p.vx *= -1;
-        if (p.y < 0 || p.y > H) p.vy *= -1;
-      }
-      for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
-        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.hypot(dx, dy);
-        if (d < D) {
-          ctx.strokeStyle = "rgba(255,255,255," + (1 - d / D) * 0.3 + ")";
-          ctx.lineWidth = 1; ctx.beginPath();
-          ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
-        }
-      }
-      ctx.fillStyle = "rgba(255,255,255,0.6)";
-      for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7); ctx.fill(); }
-    })();
+    if (!meshCanvas || typeof VANTA === "undefined" || !VANTA.WAVES || typeof THREE === "undefined") return;
+    try {
+      vanta = VANTA.WAVES({
+        el: meshCanvas, THREE: THREE,
+        mouseControls: false, touchControls: false, gyroControls: false,
+        color: 0x16161d, backgroundColor: 0x0b0b0d,
+        shininess: 28, waveHeight: 16, waveSpeed: 0.85, zoom: 0.92,
+      });
+    } catch (e) { vanta = null; }
   }
 
   function morph() {
