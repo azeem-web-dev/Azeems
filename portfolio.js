@@ -701,7 +701,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const nameEl = document.getElementById("intro-name");
   const reveal = intro.querySelector(".intro-reveal");
   const navBrand = document.querySelector(".nav-brand");
-  let meshRAF = 0;
+  let meshRAF = 0, vanta = null;
 
   // bring the hero content + nav in only AFTER the intro finishes
   function revealHero() {
@@ -761,7 +761,6 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }
 
   // animated 3D background via Vanta.js (WAVES) — falls back to the dark stage
-  let vanta = null;
   function startMesh() {
     if (!meshCanvas || typeof VANTA === "undefined" || !VANTA.WAVES || typeof THREE === "undefined") return;
     try {
