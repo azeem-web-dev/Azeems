@@ -695,9 +695,13 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const intro = document.getElementById("intro");
   if (!intro) return;
   const greetEl = document.getElementById("intro-greet");
+  const gwText = document.getElementById("gw-text");
+  const gwPen = document.getElementById("gw-pen");
+  const meshCanvas = document.getElementById("intro-mesh");
   const nameEl = document.getElementById("intro-name");
   const reveal = intro.querySelector(".intro-reveal");
   const navBrand = document.querySelector(".nav-brand");
+  let meshRAF = 0;
 
   // bring the hero content + nav in only AFTER the intro finishes
   function revealHero() {
@@ -713,6 +717,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   }
 
   function done() {
+    cancelAnimationFrame(meshRAF);
     intro.style.display = "none";
     document.body.style.overflow = "";
     intro.remove();
@@ -728,25 +733,65 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const hasG = typeof gsap !== "undefined";
   let safety = setTimeout(done, 8000);
 
-  const greetings = ["Hello", "नमस्ते", "السلام علیکم", "హలో", "Welcome"];
-  let gi = 0;
-  const gInt = setInterval(() => {
-    gi++;
-    if (gi >= greetings.length) { clearInterval(gInt); showName(); return; }
-    greetEl.textContent = greetings[gi];
-    greetEl.style.animation = "none"; void greetEl.offsetWidth; greetEl.style.animation = "greetIn 0.26s ease both";
-  }, 250);
+  startMesh();
+  // hand-write "Hello", then "Welcome", then reveal the name
+  writeWord("Hello", () => writeWord("Welcome", showName));
+
+  function writeWord(text, cb) {
+    gwText.textContent = text;
+    greetEl.style.transition = ""; greetEl.style.opacity = "1";
+    gwText.classList.remove("draw"); gwPen.classList.remove("draw");
+    void gwText.offsetWidth;                       // restart the stroke animation
+    gwText.classList.add("draw"); gwPen.classList.add("draw");
+    setTimeout(() => {                             // stroke + brief hold, then fade out
+      greetEl.style.transition = "opacity 0.4s ease"; greetEl.style.opacity = "0";
+      setTimeout(cb, 430);
+    }, 1750);
+  }
 
   function showName() {
-    greetEl.style.animation = "none";        // clear fill mode so .hide can fade it
-    greetEl.classList.add("hide");
-    setTimeout(() => { greetEl.style.display = "none"; }, 480);
+    greetEl.style.display = "none";
     reveal.style.opacity = "1";
     if (hasG) {
       gsap.from(".intro-iam", { opacity: 0, y: 18, duration: 0.5, delay: 0.32, ease: "power3.out" });
       gsap.from(nameEl, { opacity: 0, y: 36, duration: 0.7, delay: 0.46, ease: "power3.out" });
     }
-    setTimeout(morph, 1650);
+    setTimeout(morph, 1500);
+  }
+
+  // animated network mesh behind the intro
+  function startMesh() {
+    if (!meshCanvas) return;
+    const ctx = meshCanvas.getContext("2d");
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    let W, H;
+    const N = Math.max(34, Math.min(74, Math.round(window.innerWidth / 22)));
+    const pts = Array.from({ length: N }, () => ({
+      x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.38, vy: (Math.random() - 0.5) * 0.38,
+    }));
+    function size() { W = window.innerWidth; H = window.innerHeight; meshCanvas.width = W * DPR; meshCanvas.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+    size(); window.addEventListener("resize", size);
+    const D = 160;
+    (function frame() {
+      meshRAF = requestAnimationFrame(frame);
+      ctx.clearRect(0, 0, W, H);
+      for (const p of pts) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+      }
+      for (let i = 0; i < N; i++) for (let j = i + 1; j < N; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y, d = Math.hypot(dx, dy);
+        if (d < D) {
+          ctx.strokeStyle = "rgba(255,255,255," + (1 - d / D) * 0.3 + ")";
+          ctx.lineWidth = 1; ctx.beginPath();
+          ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
+        }
+      }
+      ctx.fillStyle = "rgba(255,255,255,0.6)";
+      for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7); ctx.fill(); }
+    })();
   }
 
   function morph() {
@@ -763,7 +808,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     const tl = gsap.timeline({ onComplete: () => { clearTimeout(safety); done(); } });
     tl.to(".intro-iam", { opacity: 0, y: -14, duration: 0.4, ease: "power2.in" })
       .to(nameEl, { x: dx, y: dy, scale: scale, duration: 1.15, ease: "power3.inOut" }, "-=0.08")
-      .to(".intro-bg", { opacity: 0, duration: 0.7, ease: "power2.out" }, "-=0.85")
+      .to([".intro-bg", ".intro-mesh", ".intro-bg-glow"], { opacity: 0, duration: 0.7, ease: "power2.out" }, "-=0.85")
       .to(nameEl, { opacity: 0, duration: 0.3, ease: "power1.out" }, "-=0.18");
   }
 })();

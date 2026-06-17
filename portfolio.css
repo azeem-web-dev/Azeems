@@ -754,40 +754,30 @@ em { font-style: normal; }
    INTRO / PRELOADER — greeting → name reveal → morph into logo
    =========================================================== */
 .intro { position: fixed; inset: 0; z-index: 9999; overflow: hidden; }
-.intro-bg { position: absolute; inset: 0; background: #0b0b0d; }
-.intro-bg::before { /* faint drifting grid */
-  content: ""; position: absolute; inset: -2px;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-  -webkit-mask: radial-gradient(circle at 50% 46%, #000 25%, transparent 72%);
-          mask: radial-gradient(circle at 50% 46%, #000 25%, transparent 72%);
-  animation: introGrid 20s linear infinite;
-}
-.intro-bg::after { /* soft monochrome glow */
-  content: ""; position: absolute; inset: 0;
-  background: radial-gradient(46% 56% at 50% 45%, rgba(255,255,255,0.07), transparent 70%);
-}
-@keyframes introGrid { to { background-position: 48px 48px; } }
+.intro-bg { position: absolute; inset: 0; background: radial-gradient(60% 70% at 50% 45%, #15151b 0%, #0b0b0d 72%); }
+.intro-mesh { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-bg-glow { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(42% 52% at 50% 45%, rgba(255,255,255,0.06), transparent 70%); }
 
 .intro-greet, .intro-reveal { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-.intro-greet {
-  font-family: var(--disp); font-weight: 500; color: #fff;
-  font-size: clamp(30px, 5vw, 58px); letter-spacing: 1px; white-space: nowrap;
-  animation: greetIn 0.26s ease both;
-}
-.intro-greet.hide { opacity: 0; transform: translate(-50%, -68%); transition: opacity 0.45s ease, transform 0.45s ease; }
-@keyframes greetIn { from { opacity: 0; transform: translate(-50%, -42%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+.intro-greet { line-height: 1; }
+.gw { position: relative; display: inline-block; padding: 0 6px; }
+.gw-text { display: inline-block; white-space: nowrap; font-family: "Great Vibes", cursive; font-weight: 400;
+  font-size: clamp(70px, 12vw, 150px); color: #fff; line-height: 1.05; clip-path: inset(-12% 100% -12% 0); }
+.gw-text.draw { animation: write 1.2s cubic-bezier(.66,0,.34,1) forwards; }
+@keyframes write { to { clip-path: inset(-12% -3% -12% 0); } }
+.gw-pen { position: absolute; top: 14%; bottom: 14%; left: 0; width: 2px; border-radius: 2px;
+  background: #fff; opacity: 0; box-shadow: 0 0 12px rgba(255,255,255,0.85); }
+.gw-pen.draw { animation: pen 1.2s cubic-bezier(.66,0,.34,1) forwards; }
+@keyframes pen { 0% { left: 0; opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
 
 .intro-reveal { display: flex; flex-direction: column; align-items: center; gap: 8px; opacity: 0; }
 .intro-iam { font-family: var(--sans); font-weight: 300; color: rgba(255,255,255,0.62);
   font-size: clamp(15px, 2.2vw, 22px); letter-spacing: 4px; text-transform: uppercase; }
 .intro-name { font-family: var(--disp); font-weight: 700; color: #fff;
   font-size: clamp(64px, 13vw, 150px); line-height: 1; letter-spacing: 1px; transform-origin: top left; }
-
 @media (prefers-reduced-motion: reduce) {
-  .intro-bg::before { animation: none; }
+  .gw-text, .gw-pen { animation: none !important; clip-path: none !important; }
 }
 
 /* while the intro plays, keep the page empty — nav + hero content hidden */
