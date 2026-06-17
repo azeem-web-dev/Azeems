@@ -685,3 +685,71 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
     }
   });
 })();
+
+/* ===========================================================
+   Intro / preloader — multilingual greeting → "I am Azeem" →
+   the name flies up to become the navbar logo (FLIP morph).
+   Shows once per session.
+   =========================================================== */
+(function intro() {
+  const intro = document.getElementById("intro");
+  if (!intro) return;
+  const greetEl = document.getElementById("intro-greet");
+  const nameEl = document.getElementById("intro-name");
+  const reveal = intro.querySelector(".intro-reveal");
+  const navBrand = document.querySelector(".nav-brand");
+
+  function done() {
+    intro.style.display = "none";
+    document.body.style.overflow = "";
+    intro.remove();
+  }
+
+  let seen = false;
+  try { seen = sessionStorage.getItem("introSeen") === "1"; sessionStorage.setItem("introSeen", "1"); } catch (e) {}
+  if (REDUCED_MOTION || seen) { done(); return; }
+
+  document.body.style.overflow = "hidden";
+  window.scrollTo(0, 0);
+  const hasG = typeof gsap !== "undefined";
+  let safety = setTimeout(done, 8000);
+
+  const greetings = ["Hello", "नमस्ते", "السلام علیکم", "హలో", "Welcome"];
+  let gi = 0;
+  const gInt = setInterval(() => {
+    gi++;
+    if (gi >= greetings.length) { clearInterval(gInt); showName(); return; }
+    greetEl.textContent = greetings[gi];
+    greetEl.style.animation = "none"; void greetEl.offsetWidth; greetEl.style.animation = "greetIn 0.26s ease both";
+  }, 250);
+
+  function showName() {
+    greetEl.style.animation = "none";        // clear fill mode so .hide can fade it
+    greetEl.classList.add("hide");
+    setTimeout(() => { greetEl.style.display = "none"; }, 480);
+    reveal.style.opacity = "1";
+    if (hasG) {
+      gsap.from(".intro-iam", { opacity: 0, y: 18, duration: 0.5, delay: 0.32, ease: "power3.out" });
+      gsap.from(nameEl, { opacity: 0, y: 36, duration: 0.7, delay: 0.46, ease: "power3.out" });
+    }
+    setTimeout(morph, 1650);
+  }
+
+  function morph() {
+    if (!hasG || !navBrand) { // graceful fallback: simple fade out
+      intro.style.transition = "opacity 0.6s ease"; intro.style.opacity = "0";
+      clearTimeout(safety); setTimeout(done, 650); return;
+    }
+    const a = nameEl.getBoundingClientRect();
+    const b = navBrand.getBoundingClientRect();
+    const scale = b.height / a.height;
+    const dx = b.left - a.left;
+    const dy = b.top - a.top;
+
+    const tl = gsap.timeline({ onComplete: () => { clearTimeout(safety); done(); } });
+    tl.to(".intro-iam", { opacity: 0, y: -14, duration: 0.4, ease: "power2.in" })
+      .to(nameEl, { x: dx, y: dy, scale: scale, duration: 1.15, ease: "power3.inOut" }, "-=0.08")
+      .to(".intro-bg", { opacity: 0, duration: 0.7, ease: "power2.out" }, "-=0.85")
+      .to(nameEl, { opacity: 0, duration: 0.3, ease: "power1.out" }, "-=0.18");
+  }
+})();
