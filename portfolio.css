@@ -61,7 +61,7 @@ em { font-style: normal; }
 .nav {
   position: fixed; inset: 0 0 auto 0; z-index: 100;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 22px 48px; transition: padding 0.4s ease, background 0.4s ease, box-shadow 0.4s ease;
+  padding: 22px 48px; transition: padding 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, opacity 0.7s ease;
 }
 .nav.scrolled {
   padding: 12px 48px;
@@ -789,3 +789,8 @@ em { font-style: normal; }
 @media (prefers-reduced-motion: reduce) {
   .intro-bg::before { animation: none; }
 }
+
+/* while the intro plays, keep the page empty — nav + hero content hidden */
+body.intro-running .nav { opacity: 0; pointer-events: none; }
+body.intro-running .hero-inner { opacity: 0; }
+body.intro-running #chat-fab, body.intro-running .chat-tip { opacity: 0 !important; pointer-events: none; }

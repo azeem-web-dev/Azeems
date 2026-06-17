@@ -38,7 +38,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
 
   // text blocks & headings glide in from the side
   gsap.utils.toArray(".reveal").forEach((el) => {
-    if (el.closest(".proof-grid, .edu-grid")) return; // those cards are handled below
+    if (el.closest(".proof-grid, .edu-grid, #home")) return; // proof/edu handled below; hero handled by the intro
     const dir = el.dataset.from === "right" ? 1 : -1;
     gsap.fromTo(el, { x: dir * 60, opacity: 0 }, {
       x: 0, opacity: 1, duration: 1.0, ease: "power3.out",
@@ -699,16 +699,30 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const reveal = intro.querySelector(".intro-reveal");
   const navBrand = document.querySelector(".nav-brand");
 
+  // bring the hero content + nav in only AFTER the intro finishes
+  function revealHero() {
+    document.body.classList.remove("intro-running");
+    const items = document.querySelectorAll("#home .reveal");
+    if (!items.length) return;
+    if (REDUCED_MOTION || typeof gsap === "undefined") {
+      items.forEach((e) => { e.style.opacity = "1"; e.style.transform = "none"; });
+      return;
+    }
+    gsap.set(items, { opacity: 0, y: 26 });
+    gsap.to(items, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", stagger: 0.12 });
+  }
+
   function done() {
     intro.style.display = "none";
     document.body.style.overflow = "";
     intro.remove();
+    revealHero();
   }
 
-  let seen = false;
-  try { seen = sessionStorage.getItem("introSeen") === "1"; sessionStorage.setItem("introSeen", "1"); } catch (e) {}
-  if (REDUCED_MOTION || seen) { done(); return; }
+  // play the intro on every visit/refresh (no session gate)
+  if (REDUCED_MOTION) { done(); return; }
 
+  document.body.classList.add("intro-running"); // keep page empty while the intro plays
   document.body.style.overflow = "hidden";
   window.scrollTo(0, 0);
   const hasG = typeof gsap !== "undefined";
