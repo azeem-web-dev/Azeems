@@ -475,7 +475,7 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   const DATA = [
     { label: "Programming",        r1: ["Python", "JavaScript"],            r2: ["C", "Dart"] },
     { label: "Web & Mobile",       r1: ["HTML5 / CSS3", "React.js", "Node.js"], r2: ["Flutter", "UI / UX", "PyQt6"] },
-    { label: "AI & Machine Learning", r1: ["OpenCV", "YOLO", "PyTorch"],    r2: ["TensorFlow", "Pandas", "CUDA / GPU", "ML Kit"] },
+    { label: "AI & Machine Learning", r1: ["OpenCV", "AI"],    r2: ["TensorFlow"] },
     { label: "Data & Tools",       r1: ["MySQL", "Supabase", "Firebase"],   r2: ["REST APIs", "Git / GitHub", "Docker · Linux", "Postman"] },
   ];
   const RF1 = 0.25, RF2 = 0.385;
