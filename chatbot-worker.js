@@ -108,11 +108,15 @@ export default {
     try {
       r = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
         method: "POST",
-        headers: { "Authorization": `Bearer ${env.NVIDIA_API_KEY}`, "Content-Type": "application/json" },
+        headers: {
+          "Authorization": `Bearer ${env.NVIDIA_API_KEY}`,
+          "Content-Type": "application/json",
+          "Accept": "text/event-stream",
+        },
         body: JSON.stringify({
           model: MODEL,
           messages: [{ role: "system", content: SYSTEM }, ...msgs],
-          temperature: 0.6, top_p: 0.95, max_tokens: 700, stream: false,
+          temperature: 0.6, top_p: 0.95, max_tokens: 700, stream: true,
         }),
       });
     } catch (e) { return json({ error: "Could not reach the model", detail: String(e) }, 502, cors); }
@@ -121,10 +125,10 @@ export default {
       const detail = (await r.text()).slice(0, 300);
       return json({ error: "Model API error", status: r.status, detail }, 502, cors);
     }
-    const data = await r.json();
-    const reply = data?.choices?.[0]?.message?.content || "";
-    if (!reply) return json({ error: "Empty reply" }, 502, cors);
-    return json({ reply }, 200, cors);
+    // stream NVIDIA's tokens straight back to the browser (Cloudflare doesn't buffer)
+    return new Response(r.body, {
+      headers: { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache" },
+    });
   },
 };
 
