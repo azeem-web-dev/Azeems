@@ -3,16 +3,16 @@
    chat.php — AI assistant proxy for the portfolio (Hostinger PHP)
    The NVIDIA API key is NEVER in this repo. It is read from an
    environment variable, or from secrets.php (which is .gitignored).
-   The browser only ever talks to this file — same origin.
+   Non-streaming (reliable on shared hosting / LiteSpeed): fetches the
+   full reply and returns it as JSON.
    =========================================================== */
 
-header('Content-Type: text/event-stream; charset=utf-8');
-header('Cache-Control: no-cache');
-header('X-Accel-Buffering: no'); // discourage proxy buffering so it streams
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
   http_response_code(405);
-  echo 'data: ' . json_encode(['error' => 'POST only']) . "\n\n";
+  echo json_encode(['error' => 'POST only']);
   exit;
 }
 
@@ -45,8 +45,7 @@ EXPERIENCE: Co-Founder/CEO/Lead Developer — HMGenX (2023–present); Front-end
 InLighnX Global (Jul–Sep 2025); Web Dev Intern — Konic Technologies (Apr–Jul 2025).
 
 SKILLS: Python, C, JavaScript, Dart; HTML/CSS, React, Node.js, Flutter, PyQt6, UI/UX;
-OpenCV, YOLO, PyTorch, TensorFlow, Pandas, CUDA/GPU, ML Kit; MySQL, Supabase, Firebase,
-REST APIs, Git/GitHub, Docker, Linux, Postman.
+OpenCV, AI, TensorFlow; MySQL, Supabase, Firebase, REST APIs, Git/GitHub, Docker, Linux, Postman.
 
 EDUCATION: B.Tech CSE — RISE Krishna Sai Prakasam, Valluru (expected 2027, SGPA 8.44);
 Intermediate MPC — Narayana Junior College (2023, 95.3%); SSC — Narayana EM School (2021, 100%).
@@ -65,7 +64,7 @@ $key = getenv('NVIDIA_API_KEY');
 if (!$key && is_file(__DIR__ . '/secrets.php')) { $key = require __DIR__ . '/secrets.php'; }
 if (!$key) {
   http_response_code(500);
-  echo 'data: ' . json_encode(['error' => 'Server not configured']) . "\n\n";
+  echo json_encode(['error' => 'Server not configured (no API key)']);
   exit;
 }
 
@@ -79,7 +78,7 @@ if (isset($body['messages']) && is_array($body['messages'])) {
     $msgs[] = ['role' => $m['role'], 'content' => mb_substr((string)$m['content'], 0, 1500)];
   }
 }
-if (!$msgs) { echo 'data: ' . json_encode(['error' => 'No messages']) . "\n\n"; exit; }
+if (!$msgs) { echo json_encode(['error' => 'No messages']); exit; }
 
 $payload = [
   'model'       => $MODEL,
@@ -87,29 +86,45 @@ $payload = [
   'temperature' => 0.6,
   'top_p'       => 0.95,
   'max_tokens'  => 700,
-  'stream'      => true,
+  'stream'      => false,
 ];
 
-// --- stream NVIDIA's SSE straight back to the browser ---
-@ini_set('zlib.output_compression', '0');
-while (ob_get_level() > 0) { @ob_end_flush(); }
+if (!function_exists('curl_init')) {
+  http_response_code(500);
+  echo json_encode(['error' => 'PHP cURL is not enabled on this host']);
+  exit;
+}
 
 $ch = curl_init('https://integrate.api.nvidia.com/v1/chat/completions');
 curl_setopt_array($ch, [
-  CURLOPT_POST       => true,
-  CURLOPT_HTTPHEADER => [
+  CURLOPT_POST           => true,
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER     => [
     'Authorization: Bearer ' . $key,
     'Content-Type: application/json',
-    'Accept: text/event-stream',
+    'Accept: application/json',
   ],
-  CURLOPT_POSTFIELDS    => json_encode($payload),
-  CURLOPT_WRITEFUNCTION => function ($ch, $data) {
-    echo $data; @ob_flush(); @flush();
-    return strlen($data);
-  },
-  CURLOPT_TIMEOUT => 60,
+  CURLOPT_POSTFIELDS => json_encode($payload),
+  CURLOPT_TIMEOUT    => 45,
 ]);
-if (curl_exec($ch) === false) {
-  echo 'data: ' . json_encode(['error' => 'Upstream error', 'detail' => curl_error($ch)]) . "\n\n";
-}
+$raw    = curl_exec($ch);
+$status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$cerr   = curl_error($ch);
 curl_close($ch);
+
+if ($raw === false) {
+  http_response_code(502);
+  echo json_encode(['error' => 'Could not reach the model', 'detail' => $cerr]);
+  exit;
+}
+if ($status < 200 || $status >= 300) {
+  http_response_code($status);
+  echo json_encode(['error' => 'Model API error', 'status' => $status, 'detail' => mb_substr($raw, 0, 300)]);
+  exit;
+}
+
+$data  = json_decode($raw, true);
+$reply = $data['choices'][0]['message']['content'] ?? '';
+if ($reply === '') { echo json_encode(['error' => 'Empty reply']); exit; }
+
+echo json_encode(['reply' => $reply]);

@@ -653,30 +653,12 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: history }),
       });
-      if (!res.ok || !res.body) throw new Error("bad response");
-
-      bubble.classList.remove("typing"); bubble.textContent = "";
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      let buf = "", full = "";
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += dec.decode(value, { stream: true });
-        const lines = buf.split("\n"); buf = lines.pop();
-        for (const line of lines) {
-          const s = line.trim();
-          if (!s.startsWith("data:")) continue;
-          const data = s.slice(5).trim();
-          if (data === "[DONE]" || !data) continue;
-          try {
-            const piece = JSON.parse(data).choices?.[0]?.delta?.content;
-            if (piece) { full += piece; bubble.textContent = full; log.scrollTop = log.scrollHeight; }
-          } catch { /* ignore keep-alive lines */ }
-        }
-      }
-      if (!full) bubble.textContent = "Sorry, I didn't catch that — could you rephrase?";
-      history.push({ role: "assistant", content: full });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.reply) throw new Error(data.error || "bad response");
+      bubble.classList.remove("typing");
+      bubble.textContent = data.reply;
+      log.scrollTop = log.scrollHeight;
+      history.push({ role: "assistant", content: data.reply });
     } catch (err) {
       bubble.classList.remove("typing");
       bubble.textContent = "Sorry — I couldn't reach the assistant right now. You can email Rayyan at ridahuda03@gmail.com.";
