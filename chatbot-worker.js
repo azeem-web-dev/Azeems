@@ -5,7 +5,7 @@
    Non-streaming: returns { "reply": "..." } as JSON.
    =========================================================== */
 
-const MODEL = "z-ai/glm-5.1"; // any NVIDIA model id
+const MODEL = "meta/llama-3.3-70b-instruct"; // any NVIDIA model id
 
 const SYSTEM = `You are "Azeem's Assistant" — the friendly, sharp AI host on Rayyan Azeem Syed's
 portfolio (azeem.highflyers.io). Your job: help visitors (recruiters, HR, founders, potential
