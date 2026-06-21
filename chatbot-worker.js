@@ -35,7 +35,7 @@ point them to the contact form on the site or his email.`;
 export default {
   async fetch(request, env) {
     const cors = {
-      "Access-Control-Allow-Origin": "*", // tighten to "https://azeem.highflyers.io" if you like
+      "Access-Control-Allow-Origin": "https://azeem.highflyers.io",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };

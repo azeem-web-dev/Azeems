@@ -33,5 +33,6 @@ Commit & push (auto-deploys to Hostinger). Open the site → chat works.
   700 max tokens, last 12 turns, input capped.
 - To lock it to your site, change `Access-Control-Allow-Origin: "*"` to
   `"https://azeem.highflyers.io"`.
-- `chat.php` / `secrets.php` are now unused (kept for reference). You can delete
-  them: `git rm chat.php secrets.php`.
+- The old `chat.php` / `secrets.php` PHP proxy was removed (Hostinger couldn't
+  reach NVIDIA). The Cloudflare Worker is the live proxy.
+- CORS is locked to https://azeem.highflyers.io in `chatbot-worker.js`.
