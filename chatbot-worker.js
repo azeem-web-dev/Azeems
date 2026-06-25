@@ -5,7 +5,7 @@
    Streaming: pipes NVIDIA token chunks (SSE) straight to the browser.
    =========================================================== */
 
-const MODEL = "meta/llama-3.1-8b-instruct"; // any NVIDIA model id
+const MODEL = "qwen/qwen3-next-80b-a3b-instruct"; // any NVIDIA model id
 
 const SYSTEM = `You are "Azeem's Assistant" — the friendly, sharp AI host on Rayyan Azeem Syed's
 portfolio (azeem.highflyers.io). Your job: help visitors (recruiters, HR, founders, potential
