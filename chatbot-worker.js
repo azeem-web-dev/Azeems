@@ -2,10 +2,10 @@
    Azeem portfolio — AI assistant proxy (Cloudflare Worker)
    Browser → this Worker → NVIDIA. The API key lives ONLY here as
    the secret env var NVIDIA_API_KEY (never in the website code).
-   Non-streaming: returns { "reply": "..." } as JSON.
+   Streaming: pipes NVIDIA token chunks (SSE) straight to the browser.
    =========================================================== */
 
-const MODEL = "meta/llama-3.3-70b-instruct"; // any NVIDIA model id
+const MODEL = "meta/llama-3.1-8b-instruct"; // any NVIDIA model id
 
 const SYSTEM = `You are "Azeem's Assistant" — the friendly, sharp AI host on Rayyan Azeem Syed's
 portfolio (azeem.highflyers.io). Your job: help visitors (recruiters, HR, founders, potential
