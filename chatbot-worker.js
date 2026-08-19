@@ -27,13 +27,15 @@
    `content` as ONE final chunk — which kills token-by-token streaming, shows
    the thinking to visitors, and burns max_tokens before writing an answer. */
 const MODELS = [
-  "meta/llama-3.3-70b-instruct",       // non-reasoning, fast, known-good
-  "meta/llama-3.1-70b-instruct",       // non-reasoning fallback
-  "mistralai/mistral-large-2-instruct",// non-reasoning fallback
-  "meta/llama-3.1-8b-instruct",        // last resort, always available
+  "meta/llama-3.3-70b-instruct",       // best quality for the 16k grounding context
+  "meta/llama-3.1-8b-instruct",        // known-good + fast: keeps worst case short
+  "meta/llama-3.1-70b-instruct",       // further fallbacks
+  "mistralai/mistral-large-2-instruct",
 ];
 const DEFAULT_SITE = "https://azeem.highflyers.io";
 const KB_TTL = 1800;        // seconds to edge-cache the scraped knowledge (30 min)
+const KB_TIMEOUT_MS = 8000;    // per scraped file
+const MODEL_TIMEOUT_MS = 12000;// wait for the model's response headers, then stream freely
 const KB_MAX_CHARS = 20000; // hard cap so the site can never blow the context
 
 /* ===========================================================
@@ -127,6 +129,7 @@ async function fetchSource(url) {
     const r = await fetch(url, {
       cf: { cacheTtl: KB_TTL, cacheEverything: true },
       headers: { "User-Agent": "AzeemAssistant-KB/1.0" },
+      signal: AbortSignal.timeout(KB_TIMEOUT_MS),
     });
     return r.ok ? await r.text() : "";
   } catch {
@@ -185,9 +188,15 @@ export default {
 
     let r = null, used = "", lastErr = "no model attempted";
     for (const model of MODELS) {
+      // A model that hangs is not an error code — without this, the chain
+      // would never advance and the widget would spin forever. Abort if the
+      // response headers don't arrive in time, then let the body stream freely.
+      const ac = new AbortController();
+      const timer = setTimeout(() => ac.abort(), MODEL_TIMEOUT_MS);
       try {
         r = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
           method: "POST",
+          signal: ac.signal,
           headers: {
             "Authorization": "Bearer " + env.NVIDIA_API_KEY,
             "Content-Type": "application/json",
@@ -199,7 +208,13 @@ export default {
             temperature: 0.6, top_p: 0.95, max_tokens: 800, stream: true,
           }),
         });
-      } catch (e) { lastErr = String(e); r = null; continue; }
+      } catch (e) {
+        lastErr = model + " -> " + String(e);
+        r = null;
+        continue;
+      } finally {
+        clearTimeout(timer); // headers are in; do not abort the streaming body
+      }
 
       if (r.ok) { used = model; break; }
 
