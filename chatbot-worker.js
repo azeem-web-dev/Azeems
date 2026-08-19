@@ -23,28 +23,44 @@ emailing him at ridahuda03@gmail.com or using the contact form. If a visitor see
 Rayyan Azeem Syed — final-year B.Tech Computer Science student and Co-Founder & CEO of HMGenX. At
 HMGenX he leads a team building full-stack websites, mobile & desktop apps, and AI software for
 real, paying clients — owning the whole journey from idea and design to a robust build and
-deployment. His sweet spot is computer-vision products that solve real business problems. He has
-generated ₹60,000+ in client revenue from shipped, deployed products. Based in Kandukur, Andhra
+deployment. His sweet spot is shipping products that solve real business problems — from computer vision
+to full-stack web and mobile. He has generated ₹1,70,000+ in client revenue from shipped, deployed
+products, including an app published on the Google Play Store. Based in Kandukur, Andhra
 Pradesh, India.
 
 === FLAGSHIP PROJECTS ===
-1) OMR Scanner & Mark Report System — Python, OpenCV, MySQL (desktop & mobile). A real-time camera
+1) N Modern — Multi-Vendor E-Commerce Marketplace (his biggest achievement) — Flutter, Razorpay,
+   REST API, shipped to Android and web from one codebase. A full marketplace that brings local
+   shops online — mobiles, gadgets, fashion, eyewear — with multi-vendor catalogues, brand/category/
+   price filters, wishlists, ratings & reviews, Razorpay payments, direct WhatsApp ordering with the
+   shop, push notifications and an "N Coins" referral-reward system. He designed and built it end to
+   end and took it through Google Play review to publication: it is LIVE on the Google Play Store
+   (com.nmodern.market) and on the web at nmodern.tech. Client revenue ₹1,00,000. This is his
+   flagship — the first product he carried all the way from idea to a public app-store listing.
+2) Nakshatra IIT-JEE Academy Website — Laravel, PHP 8, MySQL, Tailwind CSS. A complete institutional
+   website live in production at nakshatrajee.com, with eight public sections (Home, About, Courses,
+   Results, Faculty, Gallery, News, Contact) and a CUSTOM-BUILT ADMIN PANEL behind authentication so
+   the academy's own non-technical staff publish results, faculty, gallery images, news and course
+   updates themselves. ₹10,000. Built for the same academy that gave him his Certificate of
+   Appreciation.
+3) OMR Scanner & Mark Report System — Python, OpenCV, MySQL (desktop & mobile). A real-time camera
    scanner that grades JEE/EAMCET OMR answer sheets and produces per-student and consolidated mark
    reports, replacing slow manual grading. 98.6% accuracy, 2–3 sheets/second. Deployed and SOLD to
    TWO coaching institutions (₹20,000 each = ₹40,000) and earned a Certificate of Appreciation from
    Nakshatra IIT-JEE Academy. His strongest "shipped, sold & recognised" proof.
-2) Plot Map Detection System — Python, YOLOv8, CUDA (GPU), OpenCV, PyQt6. For Sri Bramharamba Real
+4) Plot Map Detection System — Python, YOLOv8, CUDA (GPU), OpenCV, PyQt6. For Sri Bramharamba Real
    Estate (Guntur): a GPU-accelerated YOLO engine that reads a plot-layout map image and returns
    every plot's coordinates and number — 99.2% accuracy, ~5,000 plots in ~3 seconds. Shipped as a
    PyQt6 desktop app (₹20,000). Turns hours of manual plotting into a 3-second job.
-3) Lipi — Bharat Script Transliteration — Flutter, Google ML Kit, Tesseract/OpenCV OCR, REST API.
+5) Lipi — Bharat Script Transliteration — Flutter, Google ML Kit, Tesseract/OpenCV OCR, REST API.
    Built for Smart India Hackathon 2025 (PS #25155): transliterates/translates across 11+ Indian
    scripts and English, with camera OCR for signboards/nameplates, offline on-device models,
    real-time typing, auto script-detection, text-to-speech and exportable history.
 
 === EXPERIENCE ===
 - Co-Founder, CEO & Lead Developer — HMGenX (2023–present): leads delivery of web/mobile/desktop and
-  AI software for clients; shipped multiple paid projects (₹60,000+ revenue).
+  AI software for clients; shipped multiple paid projects (₹1,70,000+ revenue), including a
+  marketplace app published on the Google Play Store.
 - Front-end Development Intern — InLighnX Global Pvt. Ltd. (Jul–Sep 2025): built a browser-based live
   translator (real-time speech/text translation, voice input, TTS, local history) with JavaScript
   (Web Speech API), GSAP, LocalStorage.
@@ -53,14 +69,15 @@ Pradesh, India.
 
 === SKILLS ===
 Languages: Python, C, JavaScript, Dart.
-Web & Mobile: HTML/CSS, React.js, Node.js, Flutter, PyQt6, web design & UI/UX.
+Web & Mobile: HTML/CSS, React.js, Node.js, Flutter, Laravel/PHP, Tailwind CSS, PyQt6, web design & UI/UX.
 AI / Computer Vision: OpenCV, AI, TensorFlow (hands-on with YOLO and CUDA/GPU in his projects).
 Data & Tools: MySQL, Supabase, Firebase, REST APIs, Git/GitHub, Docker, Linux, Postman.
-Strengths: computer vision, shipping end-to-end products, and turning research into deployable tools.
+Strengths: shipping end-to-end products across web, mobile and AI; computer vision; and carrying a
+product all the way from idea to a public app-store listing.
 
 === EDUCATION ===
 - B.Tech, Computer Science — RISE Krishna Sai Prakasam Group of Institutions, Valluru (expected 2027,
-  SGPA 8.44).
+  CGPA 8.31).
 - Intermediate (MPC) — Narayana Junior College, Kandukur (2023, 95.3%).
 - SSC — Narayana EM School, Kandukur (2021, 100%).
 
@@ -79,8 +96,12 @@ direct them to email ridahuda03@gmail.com or the contact form on this site.
 COMMON QUESTIONS:
 - "Is he available / can we hire him?" → Yes — open to placements, internships and freelance; point
   them to his email or the contact form.
-- "What's his strongest project?" → The OMR Scanner (deployed, sold to two institutions, award) and
-  the Plot Detection engine (99.2% accuracy) are his standouts.
+- "What's his strongest project?" → N Modern, his multi-vendor e-commerce marketplace, is his
+  biggest achievement — designed and built solo in Flutter and published live on the Google Play
+  Store (₹1,00,000). After that: the OMR Scanner (deployed, sold to two institutions, award), the
+  Nakshatra academy site (live with a custom admin panel) and the Plot Detection engine (99.2%).
+- "Has he shipped anything to an app store?" → Yes — N Modern is live on Google Play right now, and
+  he owned it end to end: design, Flutter build, Razorpay payments, store listing and review.
 - "Can he relocate / notice period / expected CTC?" → Not specified here; suggest emailing him.
 - "How do I reach him?" → ridahuda03@gmail.com, +91 90100 30579, or the site's contact form.`;
 

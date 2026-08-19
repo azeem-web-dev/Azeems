@@ -15,10 +15,11 @@ window.addEventListener("scroll", () => nav.classList.toggle("scrolled", window.
 const counterIO = new IntersectionObserver((entries) => {
   entries.forEach((e) => {
     if (!e.isIntersecting) return;
-    const el = e.target, target = +el.dataset.count, dur = 1600, t0 = performance.now();
+    const el = e.target, raw = el.dataset.count, target = +raw, dur = 1600, t0 = performance.now();
+    const dp = (raw.split(".")[1] || "").length;   // keep decimals (e.g. 95.6) intact
     const tick = (t) => {
       const p = Math.min((t - t0) / dur, 1);
-      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      el.textContent = (target * (1 - Math.pow(1 - p, 3))).toFixed(dp);
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
@@ -75,6 +76,30 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   if (!ov || !content) return;
 
   const DATA = {
+    nmodern: {
+      eyebrow: "E-Commerce · Published on Google Play",
+      title: "N Modern — Multi-Vendor Marketplace",
+      badges: ["Flutter", "Razorpay", "Android &amp; Web", "REST API", "₹1,00,000 revenue"],
+      overview: "A production multi-vendor e-commerce marketplace, live on the Google Play Store, that brings local shops online — mobiles, earphones, power banks, smart watches, fashion and eyewear from verified sellers, all inside one clean app.",
+      challenge: "Local shopkeepers hold real stock at real prices but have no way to reach customers beyond walk-ins, while shoppers can't compare what's available near them without visiting each store in person.",
+      approach: "I designed and built the product end to end in Flutter, shipping from a single codebase to both Android and the web. It covers multi-vendor catalogues, brand / category / price search filters, wishlists, ratings &amp; reviews, Razorpay payments, direct WhatsApp enquiry and ordering with the shop, push notifications for order updates, and an <strong>N Coins</strong> referral-reward loop — then I took it through Google Play review to publication.",
+      metrics: [["Live", "On Google Play"], ["₹1,00,000", "Revenue"], ["2", "Platforms shipped"]],
+      result: "Published on the <strong>Google Play Store</strong> as <strong>N Modern</strong> and running on the web at nmodern.tech — a product carried the whole way from idea to a public app-store listing.",
+      shots: [],
+      links: [["View on Google Play", "https://play.google.com/store/apps/details?id=com.nmodern.market", true], ["nmodern.tech", "https://nmodern.tech", false]],
+    },
+    nakshatra: {
+      eyebrow: "Full-Stack Web · Client Project",
+      title: "Nakshatra IIT-JEE Academy Website",
+      badges: ["Laravel", "PHP 8", "MySQL", "Tailwind CSS", "₹10,000 revenue"],
+      overview: "A complete, deployed website for Nakshatra IIT-JEE Academy — the same institution that awarded me a Certificate of Appreciation for the OMR Scanner — backed by a custom admin panel that lets non-technical staff run the entire site themselves.",
+      challenge: "The academy had no web presence at all. Prospective students and parents had no way to see courses, results, faculty or announcements — and whatever was built had to stay editable by teachers, not developers.",
+      approach: "I built the front end with Laravel Blade and Tailwind CSS across eight public sections — Home, About, Courses, Results, Faculty, Gallery, News and Contact — and paired it with a bespoke admin panel behind authentication. Staff publish results, add faculty, upload gallery images, post news and update course details without touching code.",
+      metrics: [["8", "Public sections"], ["Full", "Admin CMS"], ["Live", "In production"]],
+      result: "Live in production at <strong>nakshatrajee.com</strong>, managed day to day by the academy's own staff through the admin panel.",
+      shots: [],
+      links: [["Visit nakshatrajee.com", "https://nakshatrajee.com", true]],
+    },
     omr: {
       eyebrow: "Computer Vision · Deployed Product",
       title: "OMR Scanner & Mark Report System",
@@ -156,8 +181,10 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
   function finish() { ov.classList.remove("open"); ov.setAttribute("aria-hidden", "true"); document.body.style.overflow = ""; }
 
   document.querySelectorAll("[data-project]").forEach((card) => {
-    card.addEventListener("click", () => open(card.dataset.project));
-    card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(card.dataset.project); } });
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return;   // let real links (Play Store, live site) through
+      open(card.dataset.project);
+    });
   });
   ov.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && ov.classList.contains("open")) close(); });
