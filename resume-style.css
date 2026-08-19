@@ -285,6 +285,7 @@ a:hover { text-decoration: underline; }
     background: #fff;
     padding: 0;
     font-size: 10.5px;
+    line-height: 1.34; /* screen uses 1.5 — the single biggest space saver here */
   }
   .no-print { display: none !important; }
 
@@ -303,26 +304,29 @@ a:hover { text-decoration: underline; }
     print-color-adjust: exact;
   }
 
-  .header { padding: 18px 32px; }
+  .header { padding: 14px 32px; }
   .name { font-size: 25px; }
   .title { font-size: 12px; }
   .contact { font-size: 10px; gap: 3px; }
 
-  .col-left  { padding: 16px 18px 16px 32px; }
-  .col-right { padding: 16px 32px 16px 18px; }
+  .col-left  { padding: 13px 18px 13px 32px; }
+  .col-right { padding: 13px 32px 13px 18px; }
 
-  .section { margin-bottom: 14px; }
-  .section-title { font-size: 11px; margin-bottom: 8px; }
+  .section-title { font-size: 11px; margin-bottom: 6px; }
   .summary, .bullets li, .lang-list li { font-size: 10px; }
   .project-name, .exp-role { font-size: 12px; }
   .project-stack, .exp-company { font-size: 9.5px; }
   .exp-date { font-size: 9.5px; }
   .tag { font-size: 9.5px; padding: 2px 7px; }
-  .section { margin-bottom: 8px; }
-  .skill-group { margin-bottom: 6px; }
-  .exp { margin-bottom: 8px; }
-  .project { margin-bottom: 8px; }
+  .section { margin-bottom: 7px; }   /* was declared twice (14px then 8px) */
+  .skill-group { margin-bottom: 5px; }
+  .exp { margin-bottom: 6px; }
+  .project { margin-bottom: 6px; }
+  .bullets li { margin-bottom: 2px; }
 
-  .grid { page-break-inside: avoid; }
+  /* NEVER put page-break-inside: avoid on .grid — it is the whole two-column
+     body. If it cannot fit under the header the browser moves the entire grid
+     to page 2, leaving page 1 as a header-only banner. Keep the guard on the
+     small blocks only, so individual entries are never split mid-item. */
   .project, .exp, .edu, .skill-group { page-break-inside: avoid; }
 }
