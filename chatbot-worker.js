@@ -27,15 +27,18 @@
    `content` as ONE final chunk — which kills token-by-token streaming, shows
    the thinking to visitors, and burns max_tokens before writing an answer. */
 const MODELS = [
-  "meta/llama-3.3-70b-instruct",       // best quality for the 16k grounding context
-  "meta/llama-3.1-8b-instruct",        // known-good + fast: keeps worst case short
-  "meta/llama-3.1-70b-instruct",       // further fallbacks
-  "mistralai/mistral-large-2-instruct",
+  "meta/llama-3.1-8b-instruct",         // proven working + fast on this account
+  "meta/llama-3.1-70b-instruct",        // better quality, promote if verified fast
+  "mistralai/mistral-large-2-instruct", // further fallback
 ];
+// meta/llama-3.3-70b-instruct is deliberately NOT listed: it accepts the
+// request and never sends a byte (verified twice — 60s and 90s, zero bytes,
+// no headers). Listing it first cost every visitor the full timeout before
+// the chain could advance.
 const DEFAULT_SITE = "https://azeem.highflyers.io";
 const KB_TTL = 1800;        // seconds to edge-cache the scraped knowledge (30 min)
 const KB_TIMEOUT_MS = 8000;    // per scraped file
-const MODEL_TIMEOUT_MS = 12000;// wait for the model's response headers, then stream freely
+const MODEL_TIMEOUT_MS = 8000; // wait for the model's response headers, then stream freely
 const KB_MAX_CHARS = 20000; // hard cap so the site can never blow the context
 
 /* ===========================================================
