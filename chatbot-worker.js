@@ -1,114 +1,167 @@
+/**
+ * Azeem's Assistant — Cloudflare Worker (self-updating)
+ *
+ * The bot's knowledge is NOT hardcoded. On each request it reads the live
+ * portfolio (index.html, resume.html and the case-study data in portfolio.js),
+ * strips them to plain text, and feeds that to the model as context.
+ *
+ * => Update the website, redeploy the site, and the bot is instantly current.
+ *    You never touch this file again.
+ *
+ * Edge-cached for KB_TTL seconds, so it costs one subrequest per source per
+ * TTL window, not one per chat message.
+ *
+ * Required secret:  NVIDIA_API_KEY
+ * Optional vars:    SITE_BASE      (defaults to the production site)
+ *                   ALLOWED_ORIGIN (defaults to the production site)
+ */
+
+/* Models are tried in order; the first one that answers wins. NVIDIA retires
+   models without warning (qwen3-next-80b died 2026-07-27 and took the bot
+   offline), so a single hardcoded id is a guaranteed future outage.
+   Live catalogue: https://integrate.api.nvidia.com/v1/models (no key needed)
+
+   IMPORTANT: use NON-REASONING instruct models only. Reasoning models
+   (nemotron-3.5-lightning, nemotron-3-super, ...) stream their chain of
+   thought in `reasoning_content` and then dump the whole transcript into
+   `content` as ONE final chunk — which kills token-by-token streaming, shows
+   the thinking to visitors, and burns max_tokens before writing an answer. */
+const MODELS = [
+  "meta/llama-3.3-70b-instruct",       // non-reasoning, fast, known-good
+  "meta/llama-3.1-70b-instruct",       // non-reasoning fallback
+  "mistralai/mistral-large-2-instruct",// non-reasoning fallback
+  "meta/llama-3.1-8b-instruct",        // last resort, always available
+];
+const DEFAULT_SITE = "https://azeem.highflyers.io";
+const KB_TTL = 1800;        // seconds to edge-cache the scraped knowledge (30 min)
+const KB_MAX_CHARS = 20000; // hard cap so the site can never blow the context
+
 /* ===========================================================
-   Azeem portfolio — AI assistant proxy (Cloudflare Worker)
-   Browser → this Worker → NVIDIA. The API key lives ONLY here as
-   the secret env var NVIDIA_API_KEY (never in the website code).
-   Streaming: pipes NVIDIA token chunks (SSE) straight to the browser.
+   Persona — the only thing you would ever hand-edit.
+   Facts live on the website, not here.
    =========================================================== */
+const PERSONA = `You are "Azeem's Assistant" — the friendly, sharp AI host on Rayyan Azeem Syed's
+portfolio. Your job: help visitors (recruiters, HR, founders, potential clients) quickly understand
+who Rayyan is and why he's worth contacting.
 
-const MODEL = "qwen/qwen3-next-80b-a3b-instruct"; // any NVIDIA model id
+STYLE: Warm, confident, concise. Default to 2-4 sentences; expand only when asked. Refer to him in
+the third person ("Rayyan...", "He..."). Plain language, no buzzword salad. Only discuss Rayyan —
+his work, skills, projects, education and availability. If asked anything off-topic, briefly and
+politely steer back to Rayyan. If a visitor seems like a good fit (hiring or a project), warmly
+encourage them to reach out.
 
-const SYSTEM = `You are "Azeem's Assistant" — the friendly, sharp AI host on Rayyan Azeem Syed's
-portfolio (azeem.highflyers.io). Your job: help visitors (recruiters, HR, founders, potential
-clients) quickly understand who Rayyan is and why he's worth contacting.
+GROUNDING — this matters: everything you say about Rayyan MUST come from the LIVE PORTFOLIO CONTENT
+below, which is scraped fresh from his website. Never invent details that aren't there. If you are
+asked something the content doesn't cover (exact salary, notice period, a technology not listed),
+say plainly that you're not certain and suggest emailing ridahuda03@gmail.com or using the contact
+form. Use the specific numbers and project names exactly as they appear in the content — they are
+current by definition. If two figures appear to conflict, quote the one stated on the project itself
+rather than a summary statistic.`;
 
-STYLE: Warm, confident, concise. Default to 2–4 sentences; expand only when asked. Refer to him in
-the third person ("Rayyan…", "He…"). Plain language, no buzzword salad. Only discuss Rayyan — his
-work, skills, projects, education, and availability. If asked anything off-topic, briefly and
-politely steer back to Rayyan. NEVER invent details not listed below; if you don't know something
-(exact salary, notice period, a tech not mentioned, etc.), say you're not certain and suggest
-emailing him at ridahuda03@gmail.com or using the contact form. If a visitor seems like a good fit
-(hiring or a project), warmly encourage them to reach out.
+/* Minimal safety net — only used if the site is unreachable. */
+const FALLBACK = `Rayyan Azeem Syed — final-year B.Tech Computer Science student and Co-Founder &
+CEO of HMGenX, building full-stack web, mobile and AI products for paying clients. Based in
+Kandukur, Andhra Pradesh, India.
+Contact: ridahuda03@gmail.com - +91 90100 30579 - linkedin.com/in/rayyanazeemsyed -
+github.com/azeem-web-dev
+(The live site could not be reached just now, so detail is limited — encourage the visitor to email
+him or browse the page directly.)`;
 
-=== WHO HE IS ===
-Rayyan Azeem Syed — final-year B.Tech Computer Science student and Co-Founder & CEO of HMGenX. At
-HMGenX he leads a team building full-stack websites, mobile & desktop apps, and AI software for
-real, paying clients — owning the whole journey from idea and design to a robust build and
-deployment. His sweet spot is shipping products that solve real business problems — from computer vision
-to full-stack web and mobile. He has generated ₹1,70,000+ in client revenue from shipped, deployed
-products, including an app published on the Google Play Store. Based in Kandukur, Andhra
-Pradesh, India.
+/* ===========================================================
+   Scrape + clean
+   =========================================================== */
+function htmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<\/(p|div|section|article|li|h[1-6]|tr|td)>/gi, "\n")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+/g, " ")
+    .replace(/ ?\n ?/g, "\n")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
 
-=== FLAGSHIP PROJECTS ===
-1) N Modern — Multi-Vendor E-Commerce Marketplace (his biggest achievement) — Flutter, Razorpay,
-   REST API, shipped to Android and web from one codebase. A full marketplace that brings local
-   shops online — mobiles, gadgets, fashion, eyewear — with multi-vendor catalogues, brand/category/
-   price filters, wishlists, ratings & reviews, Razorpay payments, direct WhatsApp ordering with the
-   shop, push notifications and an "N Coins" referral-reward system. He designed and built it end to
-   end and took it through Google Play review to publication: it is LIVE on the Google Play Store
-   (com.nmodern.market) and on the web at nmodern.tech. Client revenue ₹1,00,000. This is his
-   flagship — the first product he carried all the way from idea to a public app-store listing.
-2) Nakshatra IIT-JEE Academy Website — Laravel, PHP 8, MySQL, Tailwind CSS. A complete institutional
-   website live in production at nakshatrajee.com, with eight public sections (Home, About, Courses,
-   Results, Faculty, Gallery, News, Contact) and a CUSTOM-BUILT ADMIN PANEL behind authentication so
-   the academy's own non-technical staff publish results, faculty, gallery images, news and course
-   updates themselves. ₹10,000. Built for the same academy that gave him his Certificate of
-   Appreciation.
-3) OMR Scanner & Mark Report System — Python, OpenCV, MySQL (desktop & mobile). A real-time camera
-   scanner that grades JEE/EAMCET OMR answer sheets and produces per-student and consolidated mark
-   reports, replacing slow manual grading. 98.6% accuracy, 2–3 sheets/second. Deployed and SOLD to
-   TWO coaching institutions (₹20,000 each = ₹40,000) and earned a Certificate of Appreciation from
-   Nakshatra IIT-JEE Academy. His strongest "shipped, sold & recognised" proof.
-4) Plot Map Detection System — Python, YOLOv8, CUDA (GPU), OpenCV, PyQt6. For Sri Bramharamba Real
-   Estate (Guntur): a GPU-accelerated YOLO engine that reads a plot-layout map image and returns
-   every plot's coordinates and number — 99.2% accuracy, ~5,000 plots in ~3 seconds. Shipped as a
-   PyQt6 desktop app (₹20,000). Turns hours of manual plotting into a 3-second job.
-5) Lipi — Bharat Script Transliteration — Flutter, Google ML Kit, Tesseract/OpenCV OCR, REST API.
-   Built for Smart India Hackathon 2025 (PS #25155): transliterates/translates across 11+ Indian
-   scripts and English, with camera OCR for signboards/nameplates, offline on-device models,
-   real-time typing, auto script-detection, text-to-speech and exportable history.
+/* Pull the case-study DATA object out of portfolio.js — it holds the richest
+   per-project detail (challenge / approach / metrics / result / links). */
+function extractCaseStudies(js) {
+  const start = js.indexOf("const DATA = {");
+  if (start === -1) return "";
+  const end = js.indexOf("function render", start);
+  const block = js.slice(start, end === -1 ? start + 16000 : end);
+  return block
+    .replace(/^\s*const DATA = \{/, "")
+    .replace(/<[^>]+>/g, "")        // strip inline HTML inside the strings
+    .replace(/&amp;/g, "&")
+    .replace(/["`]/g, "")
+    .replace(/,\s*$/gm, "")
+    .replace(/^\s*[}\],]+\s*$/gm, "")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
 
-=== EXPERIENCE ===
-- Co-Founder, CEO & Lead Developer — HMGenX (2023–present): leads delivery of web/mobile/desktop and
-  AI software for clients; shipped multiple paid projects (₹1,70,000+ revenue), including a
-  marketplace app published on the Google Play Store.
-- Front-end Development Intern — InLighnX Global Pvt. Ltd. (Jul–Sep 2025): built a browser-based live
-  translator (real-time speech/text translation, voice input, TTS, local history) with JavaScript
-  (Web Speech API), GSAP, LocalStorage.
-- Web Development Intern — Konic Technologies (Apr–Jul 2025): front-end and back-end work on
-  real-time client projects.
+/* The headline stats render as "0" in the HTML — the real value lives in the
+   data-count attribute and is only animated in by JS. Recover them explicitly. */
+function extractStats(html) {
+  const re = /data-count="([\d.]+)"[^>]*>[\s\S]*?stat-unit">([^<]*)<\/span>\s*<p>([^<]+)<\/p>/g;
+  const out = [];
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    out.push("- " + m[3].trim() + ": " + m[1] + m[2].trim());
+  }
+  return out.length ? "HEADLINE STATS\n" + out.join("\n") : "";
+}
 
-=== SKILLS ===
-Languages: Python, C, JavaScript, Dart.
-Web & Mobile: HTML/CSS, React.js, Node.js, Flutter, Laravel/PHP, Tailwind CSS, PyQt6, web design & UI/UX.
-AI / Computer Vision: OpenCV, AI, TensorFlow (hands-on with YOLO and CUDA/GPU in his projects).
-Data & Tools: MySQL, Supabase, Firebase, REST APIs, Git/GitHub, Docker, Linux, Postman.
-Strengths: shipping end-to-end products across web, mobile and AI; computer vision; and carrying a
-product all the way from idea to a public app-store listing.
+async function fetchSource(url) {
+  try {
+    const r = await fetch(url, {
+      cf: { cacheTtl: KB_TTL, cacheEverything: true },
+      headers: { "User-Agent": "AzeemAssistant-KB/1.0" },
+    });
+    return r.ok ? await r.text() : "";
+  } catch {
+    return "";
+  }
+}
 
-=== EDUCATION ===
-- B.Tech, Computer Science — RISE Krishna Sai Prakasam Group of Institutions, Valluru (expected 2027,
-  CGPA 8.31).
-- Intermediate (MPC) — Narayana Junior College, Kandukur (2023, 95.3%).
-- SSC — Narayana EM School, Kandukur (2021, 100%).
+async function buildKnowledge(base) {
+  const [index, resume, js] = await Promise.all([
+    fetchSource(base + "/index.html"),
+    fetchSource(base + "/resume.html"),
+    fetchSource(base + "/portfolio.js"),
+  ]);
 
-=== HONOURS & PERSONAL ===
-Certificate of Appreciation — Nakshatra IIT-JEE Academy. Multiple chess tournament medals.
-District-level Kabaddi player. Languages: Urdu (native), Hindi, Telugu, English.
+  const parts = [];
+  if (index) {
+    const stats = extractStats(index);
+    parts.push("--- PORTFOLIO HOME PAGE ---\n" + (stats ? stats + "\n" : "") + htmlToText(index));
+  }
+  if (resume) parts.push("--- RESUME PAGE ---\n" + htmlToText(resume));
+  const cs = js ? extractCaseStudies(js) : "";
+  if (cs) parts.push("--- PROJECT CASE STUDIES ---\n" + cs);
 
-=== AVAILABILITY & CONTACT ===
-Open to software developer placements, internships, and freelance/client projects. He's a builder
-who ships and is comfortable owning a product end-to-end.
-Email: ridahuda03@gmail.com · Phone: +91 90100 30579 · Location: Kandukur, Andhra Pradesh, India.
-LinkedIn: linkedin.com/in/rayyanazeemsyed · GitHub: github.com/azeem-web-dev · LeetCode:
-leetcode.com/u/Rayyan_Azeem. For interviews, hiring, quotes, notice period or anything specific,
-direct them to email ridahuda03@gmail.com or the contact form on this site.
+  if (!parts.length) return FALLBACK;
+  return parts.join("\n\n").slice(0, KB_MAX_CHARS);
+}
 
-COMMON QUESTIONS:
-- "Is he available / can we hire him?" → Yes — open to placements, internships and freelance; point
-  them to his email or the contact form.
-- "What's his strongest project?" → N Modern, his multi-vendor e-commerce marketplace, is his
-  biggest achievement — designed and built solo in Flutter and published live on the Google Play
-  Store (₹1,00,000). After that: the OMR Scanner (deployed, sold to two institutions, award), the
-  Nakshatra academy site (live with a custom admin panel) and the Plot Detection engine (99.2%).
-- "Has he shipped anything to an app store?" → Yes — N Modern is live on Google Play right now, and
-  he owned it end to end: design, Flutter build, Razorpay payments, store listing and review.
-- "Can he relocate / notice period / expected CTC?" → Not specified here; suggest emailing him.
-- "How do I reach him?" → ridahuda03@gmail.com, +91 90100 30579, or the site's contact form.`;
-
+/* ===========================================================
+   Worker
+   =========================================================== */
 export default {
   async fetch(request, env) {
+    const origin = env.ALLOWED_ORIGIN || DEFAULT_SITE;
     const cors = {
-      "Access-Control-Allow-Origin": "https://azeem.highflyers.io", // your site only (use "*" to allow any)
+      "Access-Control-Allow-Origin": origin, // your site only (use "*" to allow any)
       "Access-Control-Allow-Methods": "POST, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
@@ -125,30 +178,53 @@ export default {
       .map((m) => ({ role: m.role, content: m.content.slice(0, 1500) }));
     if (!msgs.length) return json({ error: "No messages" }, 400, cors);
 
-    let r;
-    try {
-      r = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${env.NVIDIA_API_KEY}`,
-          "Content-Type": "application/json",
-          "Accept": "text/event-stream",
-        },
-        body: JSON.stringify({
-          model: MODEL,
-          messages: [{ role: "system", content: SYSTEM }, ...msgs],
-          temperature: 0.6, top_p: 0.95, max_tokens: 700, stream: true,
-        }),
-      });
-    } catch (e) { return json({ error: "Could not reach the model", detail: String(e) }, 502, cors); }
+    // Live, self-updating knowledge base
+    const knowledge = await buildKnowledge(env.SITE_BASE || DEFAULT_SITE);
+    const system = PERSONA +
+      "\n\n=== LIVE PORTFOLIO CONTENT (scraped from the website) ===\n" + knowledge;
 
+    let r = null, used = "", lastErr = "no model attempted";
+    for (const model of MODELS) {
+      try {
+        r = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + env.NVIDIA_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "text/event-stream",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "system", content: system }, ...msgs],
+            temperature: 0.6, top_p: 0.95, max_tokens: 800, stream: true,
+          }),
+        });
+      } catch (e) { lastErr = String(e); r = null; continue; }
+
+      if (r.ok) { used = model; break; }
+
+      // 404/410 = retired or unknown model, 400 = rejected request shape.
+      // Any of those: move on to the next candidate.
+      if (r.status === 404 || r.status === 410 || r.status === 400) {
+        lastErr = model + " -> " + r.status + " " + (await r.text()).slice(0, 200);
+        r = null;
+        continue;
+      }
+      break; // 401/429/5xx are real failures worth surfacing as-is
+    }
+
+    if (!r) return json({ error: "No model available", detail: lastErr }, 502, cors);
     if (!r.ok) {
       const detail = (await r.text()).slice(0, 300);
       return json({ error: "Model API error", status: r.status, detail }, 502, cors);
     }
-    // stream NVIDIA's tokens straight back to the browser (Cloudflare doesn't buffer)
     return new Response(r.body, {
-      headers: { ...cors, "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache" },
+      headers: {
+        ...cors,
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "X-Model-Used": used, // handy when debugging which model answered
+      },
     });
   },
 };

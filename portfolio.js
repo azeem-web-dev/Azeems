@@ -685,6 +685,14 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
         try { em = (await res.json()).error || em; } catch {}
         throw new Error(em);
       }
+      // Reasoning models wrap their chain of thought in <think>...</think>.
+      // Hide it: drop closed blocks, and everything after an unclosed opener.
+      const visible = (t) => {
+        let out = t.replace(/<think>[\s\S]*?<\/think>/gi, "");
+        const open = out.toLowerCase().lastIndexOf("<think>");
+        if (open !== -1) out = out.slice(0, open);
+        return out.replace(/^\s+/, "");
+      };
       // stream tokens in as they arrive (ChatGPT-style)
       bubble.classList.remove("typing"); bubble.textContent = "";
       const reader = res.body.getReader();
@@ -702,13 +710,17 @@ document.querySelectorAll(".stat-num").forEach((el) => counterIO.observe(el));
           if (d === "[DONE]" || !d) continue;
           try {
             const piece = JSON.parse(d).choices?.[0]?.delta?.content;
-            if (piece) { full += piece; bubble.textContent = full; log.scrollTop = log.scrollHeight; }
+            if (piece) { full += piece; bubble.textContent = visible(full); log.scrollTop = log.scrollHeight; }
           } catch { /* ignore keep-alive / partial lines */ }
         }
       }
-      if (!full) bubble.textContent = "Sorry, I didn't catch that — could you rephrase?";
-      else history.push({ role: "assistant", content: full });
+      const shown = visible(full);
+      if (!shown) bubble.textContent = "Sorry, I didn't catch that — could you rephrase?";
+      else { bubble.textContent = shown; history.push({ role: "assistant", content: shown }); }
     } catch (err) {
+      // Visitors get a friendly line; the real cause goes to the console so a
+      // dead model or bad key is diagnosable without guessing.
+      console.error("[chat] request failed:", err);
       bubble.classList.remove("typing");
       bubble.textContent = "Sorry — I couldn't reach the assistant right now. You can email Rayyan at ridahuda03@gmail.com.";
     } finally {
