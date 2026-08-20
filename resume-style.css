@@ -1,12 +1,18 @@
 /* ===========================================================
    Rayyan Azeem Syed — Resume stylesheet
-   Screen-friendly + print/PDF-optimized (A4, single page target)
+   Single-column, ATS-safe. Screen-friendly + print/PDF (A4, one page).
+
+   Why single column: large employers parse resumes automatically, and
+   two-column PDFs are routinely read out of order — sidebar content
+   (skills, education) gets dropped or interleaved into the main text.
+   One linear column with real headings parses correctly everywhere.
    =========================================================== */
 
 :root {
   --accent: #1f8a8a;          /* teal, echoing the certificate */
   --accent-dark: #156060;
   --ink: #1a2430;
+  --body: #2c3744;
   --muted: #5b6775;
   --line: #e3e8ee;
   --bg: #eef1f5;
@@ -32,7 +38,7 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Page container ---------- */
 .resume {
-  max-width: 880px;
+  max-width: 820px;
   margin: 0 auto;
   background: var(--card);
   border-radius: 12px;
@@ -44,12 +50,7 @@ a:hover { text-decoration: underline; }
 .header {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   color: #fff;
-  padding: 32px 40px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  padding: 26px 40px 22px;
 }
 .name {
   font-size: 32px;
@@ -58,69 +59,82 @@ a:hover { text-decoration: underline; }
   line-height: 1.1;
 }
 .title {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
-  margin-top: 4px;
+  margin: 4px 0 10px;
   opacity: 0.95;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
 }
 .contact {
-  list-style: none;
   font-size: 12.5px;
-  display: grid;
-  gap: 5px;
+  line-height: 1.7;
+  opacity: 0.97;
 }
 .contact a { color: #fff; }
-.contact .ico {
-  display: inline-block;
-  width: 18px;
-  font-size: 11px;
-  font-weight: 700;
-  text-align: center;
-  opacity: 0.9;
-}
+.contact .sep { opacity: 0.5; margin: 0 3px; }
 
-/* ---------- Layout grid ---------- */
-.grid {
-  display: grid;
-  grid-template-columns: 1.55fr 1fr;
-}
-.col-left  { padding: 28px 28px 28px 40px; }
-.col-right {
-  padding: 28px 40px 28px 28px;
-  background: #fafbfc;
-  border-left: 1px solid var(--line);
-}
+/* ---------- Body ---------- */
+.body { padding: 24px 40px 32px; }
 
-/* ---------- Sections ---------- */
-.section { margin-bottom: 22px; }
+.section { margin-bottom: 18px; }
 .section:last-child { margin-bottom: 0; }
 .section-title {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--accent-dark);
-  padding-bottom: 6px;
-  margin-bottom: 12px;
+  padding-bottom: 4px;
+  margin-bottom: 10px;
   border-bottom: 2px solid var(--accent);
-  display: inline-block;
 }
 
-.summary { font-size: 13.5px; color: #2c3744; }
+.summary { font-size: 13.5px; color: var(--body); }
 
-/* ---------- Projects ---------- */
-.project { margin-bottom: 16px; }
-.project:last-child { margin-bottom: 0; }
-.project-head {
+/* ---------- Skills ---------- */
+.skills { list-style: none; }
+.skills li {
+  font-size: 13px;
+  color: var(--body);
+  padding: 2px 0;
+}
+.skill-label {
+  font-weight: 700;
+  color: var(--ink);
+  display: inline-block;
+  min-width: 150px;
+}
+
+/* ---------- Entries (experience + projects share one shape) ---------- */
+.entry { margin-bottom: 13px; }
+.entry:last-child { margin-bottom: 0; }
+.entry-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
 }
-.project-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+.entry-role { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+.entry-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+.entry-org {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-dark);
+  margin: 1px 0 5px;
+}
+.entry-stack {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  margin: 2px 0 5px;
+}
 .badge {
   font-size: 11px;
   font-weight: 600;
@@ -131,46 +145,17 @@ a:hover { text-decoration: underline; }
   border-radius: 20px;
   white-space: nowrap;
 }
-.project-stack {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 500;
-  margin: 3px 0 6px;
-}
-
-/* ---------- Experience ---------- */
-.exp { margin-bottom: 14px; }
-.exp:last-child { margin-bottom: 0; }
-.exp-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-.exp-role { font-size: 15px; font-weight: 700; color: var(--ink); }
-.exp-date {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--accent-dark);
-  white-space: nowrap;
-}
-.exp-company {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent-dark);
-  margin: 1px 0 6px;
-}
 
 /* ---------- Bullets ---------- */
 .bullets { list-style: none; }
 .bullets li {
   position: relative;
-  padding-left: 16px;
-  margin-bottom: 5px;
+  padding-left: 15px;
+  margin-bottom: 4px;
   font-size: 13px;
-  color: #2c3744;
+  color: var(--body);
 }
+.bullets li:last-child { margin-bottom: 0; }
 .bullets li::before {
   content: "";
   position: absolute;
@@ -182,67 +167,19 @@ a:hover { text-decoration: underline; }
   background: var(--accent);
 }
 
-/* ---------- Skills ---------- */
-.skill-group { margin-bottom: 12px; }
-.skill-label {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: 6px;
-}
-.tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.tag {
-  font-size: 11.5px;
-  font-weight: 500;
-  background: var(--tag-bg);
-  color: var(--accent-dark);
-  border: 1px solid #d6e9e9;
-  padding: 3px 9px;
-  border-radius: 6px;
-}
-
 /* ---------- Education ---------- */
-.edu { margin-bottom: 12px; }
-.edu:last-child { margin-bottom: 0; }
-.edu-degree { font-size: 13.5px; font-weight: 700; }
-.edu-school { font-size: 12.5px; color: #34404d; }
-.edu-meta { font-size: 12px; color: var(--muted); }
-
-/* ---------- Coding profiles ---------- */
-.profile-list { list-style: none; }
-.profile-list li {
+.edu-list { list-style: none; }
+.edu-list li {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  padding: 3px 0;
-}
-.profile-list .ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 18px;
-  font-size: 9.5px;
-  font-weight: 700;
-  color: #fff;
-  background: var(--accent);
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-/* ---------- Languages ---------- */
-.lang-list { list-style: none; }
-.lang-list li {
-  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 8px;
   font-size: 13px;
-  padding: 4px 0;
-  border-bottom: 1px dashed var(--line);
+  color: var(--body);
+  padding: 2px 0;
 }
-.lang-list li:last-child { border-bottom: none; }
-
-.muted { color: var(--muted); font-weight: 400; font-size: 12px; }
+.edu-meta { font-size: 12px; color: var(--muted); white-space: nowrap; }
 
 /* ---------- Download button ---------- */
 .download-btn {
@@ -266,13 +203,11 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Responsive (mobile) ---------- */
 @media (max-width: 700px) {
-  .grid { grid-template-columns: 1fr; }
-  .col-left, .col-right {
-    padding: 24px;
-  }
-  .col-right { border-left: none; border-top: 1px solid var(--line); }
-  .header { padding: 24px; }
+  .header { padding: 22px 22px 18px; }
+  .body { padding: 20px 22px 26px; }
   .name { font-size: 26px; }
+  .skill-label { min-width: 0; display: inline; }
+  .entry-head { gap: 2px; }
 }
 
 /* ===========================================================
@@ -284,8 +219,8 @@ a:hover { text-decoration: underline; }
   body {
     background: #fff;
     padding: 0;
-    font-size: 10.5px;
-    line-height: 1.34; /* screen uses 1.5 — the single biggest space saver here */
+    font-size: 10px;
+    line-height: 1.32; /* screen uses 1.5 — the single biggest space saver here */
   }
   .no-print { display: none !important; }
 
@@ -296,37 +231,40 @@ a:hover { text-decoration: underline; }
   }
 
   /* Force background colors to print */
-  .header,
-  .badge,
-  .tag,
-  .col-right {
+  .header, .badge {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  .header { padding: 14px 32px; }
-  .name { font-size: 25px; }
-  .title { font-size: 12px; }
-  .contact { font-size: 10px; gap: 3px; }
+  /* letter-spacing makes Chrome emit gapped glyph runs, which pdftotext (and
+     therefore every ATS) reads as "F U L L- S TA C K" / "E D U CAT I O N".
+     Kill the tracking in print so the headings and the job title extract as
+     real searchable words. Screen keeps its tracking. */
+  .title, .section-title { letter-spacing: 0; }
 
-  .col-left  { padding: 13px 18px 13px 32px; }
-  .col-right { padding: 13px 32px 13px 18px; }
+  .header { padding: 15px 34px 12px; }
+  .name { font-size: 24px; }
+  .title { font-size: 11.5px; font-weight: 600; margin: 2px 0 7px; }
+  .contact { font-size: 9.5px; line-height: 1.55; }
 
-  .section-title { font-size: 11px; margin-bottom: 6px; }
-  .summary, .bullets li, .lang-list li { font-size: 10px; }
-  .project-name, .exp-role { font-size: 12px; }
-  .project-stack, .exp-company { font-size: 9.5px; }
-  .exp-date { font-size: 9.5px; }
-  .tag { font-size: 9.5px; padding: 2px 7px; }
-  .section { margin-bottom: 7px; }   /* was declared twice (14px then 8px) */
-  .skill-group { margin-bottom: 5px; }
-  .exp { margin-bottom: 6px; }
-  .project { margin-bottom: 6px; }
-  .bullets li { margin-bottom: 2px; }
+  .body { padding: 13px 34px 16px; }
 
-  /* NEVER put page-break-inside: avoid on .grid — it is the whole two-column
-     body. If it cannot fit under the header the browser moves the entire grid
-     to page 2, leaving page 1 as a header-only banner. Keep the guard on the
-     small blocks only, so individual entries are never split mid-item. */
-  .project, .exp, .edu, .skill-group { page-break-inside: avoid; }
+  .section { margin-bottom: 8px; }
+  .section-title { font-size: 10.5px; margin-bottom: 5px; padding-bottom: 3px; }
+
+  .summary, .bullets li, .skills li, .edu-list li { font-size: 9.6px; }
+  .entry-role { font-size: 11.5px; }
+  .entry-org, .entry-stack, .entry-date, .edu-meta { font-size: 9px; }
+  .badge { font-size: 8.8px; padding: 1px 6px; }
+  .skill-label { min-width: 128px; }
+
+  .entry { margin-bottom: 6px; }
+  .bullets li { margin-bottom: 2px; padding-left: 13px; }
+  .bullets li::before { top: 6px; width: 4px; height: 4px; }
+  .skills li, .edu-list li { padding: 1px 0; }
+
+  /* Keep the guard on small blocks only, so individual entries are never
+     split mid-item. Never on a wrapper that holds the whole body. */
+  .entry, .section-title { page-break-inside: avoid; }
+  .section-title { page-break-after: avoid; }
 }
